@@ -1,0 +1,139 @@
+{
+  "name": "Empresa",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "title": "Nombre",
+      "description": "Raz\u00f3n social o nombre comercial"
+    },
+    "dominio_web": {
+      "type": "string",
+      "title": "Dominio web",
+      "description": "Identifica y diferencia a la empresa; con \u00e9l sale el logo (ej: acme.com)"
+    },
+    "logo_url": {
+      "type": "string",
+      "title": "Logo",
+      "description": "URL del logo propio de la empresa (subido a mano). Si est\u00e1 vac\u00edo se usa el logo del dominio web."
+    },
+    "sector": {
+      "type": "string",
+      "title": "Sector",
+      "description": "Sector/industria (lista configurable en Configuraci\u00f3n \u2192 Listas)"
+    },
+    "ciudad": {
+      "type": "string",
+      "title": "Ciudad"
+    },
+    "pais": {
+      "type": "string",
+      "title": "Pa\u00eds",
+      "default": "Colombia"
+    },
+    "direccion": {
+      "type": "string",
+      "title": "Direcci\u00f3n"
+    },
+    "telefono": {
+      "type": "string",
+      "title": "Tel\u00e9fono"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+    },
+    "estado": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "Prospecto",
+        "Cliente_Activo",
+        "Cliente_Inactivo"
+      ],
+      "default": "Prospecto"
+    },
+    "propietario": {
+      "type": "string",
+      "title": "Propietario",
+      "description": "Ejecutivo responsable de la cuenta (Propietario del registro en HubSpot)"
+    },
+    "fecha_creacion": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de creaci\u00f3n original",
+      "description": "Fecha de creaci\u00f3n en el sistema de origen (HubSpot)"
+    },
+    "ultima_actividad": {
+      "type": "string",
+      "format": "date",
+      "title": "\u00daltima actividad"
+    },
+    "notas": {
+      "type": "string",
+      "title": "Notas"
+    }
+  },
+  "required": [
+    "nombre"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "HistorialLead",
+  "type": "object",
+  "properties": {
+    "contacto_id": { "type": "string", "title": "Contacto" },
+    "tipo": { "type": "string", "title": "Tipo", "description": "Cambio_Etapa, Nota, Mensaje_WhatsApp, Email, Tarea, Clasificacion, etc." },
+    "descripcion": { "type": "string", "title": "Descripción" },
+    "fecha": { "type": "string", "format": "date-time", "title": "Fecha" },
+    "etapa_anterior": { "type": "string", "title": "Etapa anterior" },
+    "etapa_nueva": { "type": "string", "title": "Etapa nueva" },
+    "usuario_email": { "type": "string", "title": "Usuario" },
+    "es_automatico": { "type": "boolean", "default": false, "title": "Automático" }
+  },
+  "required": ["contacto_id"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

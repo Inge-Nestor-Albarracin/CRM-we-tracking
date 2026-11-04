@@ -1,0 +1,176 @@
+{
+  "name": "Contacto",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "title": "Nombre",
+      "description": "Nombre del lead o contacto"
+    },
+    "telefono": {
+      "type": "string",
+      "title": "Telefono",
+      "description": "Telefono con codigo de pais, sin + (ej: 573105771576)"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+    },
+    "empresa": {
+      "type": "string",
+      "title": "Empresa"
+    },
+    "empresa_id": {
+      "type": "string",
+      "title": "Empresa (cuenta B2B)",
+      "description": "Referencia a la entidad Empresa"
+    },
+    "cargo": {
+      "type": "string",
+      "title": "Cargo"
+    },
+    "sector": {
+      "type": "string",
+      "title": "Sector",
+      "description": "Sector/industria (academia, bodegas, petrolera, manufactura, clubes, locativos)"
+    },
+    "que_hace_empresa": {
+      "type": "string",
+      "title": "Que hace la empresa",
+      "description": "Descripcion de a que se dedica la empresa exactamente (formulario de calificacion Emma)"
+    },
+    "motivo_interes": {
+      "type": "string",
+      "title": "Motivo de interes",
+      "description": "Por que les interesa una solucion con nuestra tecnologia (formulario de calificacion Emma)"
+    },
+    "tipo_necesidad": {
+      "type": "string",
+      "title": "Tipo de necesidad",
+      "enum": [
+        "Activos",
+        "Inventarios",
+        "Locativos"
+      ]
+    },
+    "volumen_aproximado": {
+      "type": "string",
+      "title": "Volumen aproximado"
+    },
+    "presupuesto": {
+      "type": "number",
+      "title": "Presupuesto"
+    },
+    "ciudad": {
+      "type": "string",
+      "title": "Ciudad"
+    },
+    "canal_adquisicion": {
+      "type": "string",
+      "title": "Canal de adquisicion",
+      "default": "WhatsApp"
+    },
+    "etapa_pipeline": {
+      "type": "string",
+      "title": "Etapa del pipeline",
+      "enum": [
+        "Lead",
+        "Calificado",
+        "Propuesta",
+        "Cierre",
+        "Cliente",
+        "Descalificado"
+      ],
+      "default": "Lead"
+    },
+    "fecha_primer_contacto": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha primer contacto"
+    },
+    "ultima_actividad": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Ultima actividad"
+    },
+    "en_conversacion": {
+      "type": "boolean",
+      "default": false,
+      "title": "En conversacion"
+    },
+    "broker_asignado": {
+      "type": "string",
+      "title": "Broker asignado"
+    },
+    "notas": {
+      "type": "string",
+      "title": "Notas"
+    },
+    "motivo_perdida": {
+      "type": "string",
+      "title": "Motivo de descalificaci\u00f3n"
+    }
+  },
+  "required": [
+    "nombre"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

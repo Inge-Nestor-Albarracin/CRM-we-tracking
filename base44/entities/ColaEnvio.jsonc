@@ -1,0 +1,34 @@
+{
+  "name": "ColaEnvio",
+  "type": "object",
+  "properties": {
+    "destino": {
+      "type": "string",
+      "description": "Teléfono destino con código de país sin + (ej: 573001234567)"
+    },
+    "canal": {
+      "type": "string",
+      "default": "whatsapp",
+      "description": "Canal de envío"
+    },
+    "globos_json": {
+      "type": "string",
+      "description": "JSON array de los mensajes (globos) a enviar"
+    },
+    "enviar_en": {
+      "type": "number",
+      "description": "Timestamp en ms a partir del cual se puede enviar (demora humana)"
+    },
+    "nota_id": {
+      "type": "string",
+      "description": "ID de la Nota de estado del lead (opcional, referencia)"
+    }
+  },
+  "required": ["destino", "globos_json", "enviar_en"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

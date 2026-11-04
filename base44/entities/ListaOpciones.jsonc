@@ -1,0 +1,23 @@
+{
+  "name": "ListaOpciones",
+  "type": "object",
+  "properties": {
+    "clave": {
+      "type": "string",
+      "title": "Clave de la lista",
+      "description": "Identificador interno (ej: sectores, tipos_necesidad, canales)"
+    },
+    "valores": {
+      "type": "array",
+      "title": "Valores",
+      "items": { "type": "string" }
+    }
+  },
+  "required": ["clave"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

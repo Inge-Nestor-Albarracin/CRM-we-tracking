@@ -1,0 +1,61 @@
+{
+  "name": "EmailEnviado",
+  "type": "object",
+  "properties": {
+    "contacto_id": {
+      "type": "string",
+      "title": "ID del contacto"
+    },
+    "campana_id": {
+      "type": "string",
+      "title": "ID de la campaña",
+      "description": "Null para emails individuales fuera de campana"
+    },
+    "email_destino": {
+      "type": "string",
+      "format": "email",
+      "title": "Email destinatario"
+    },
+    "nombre_destino": {
+      "type": "string",
+      "title": "Nombre destinatario"
+    },
+    "asunto": {
+      "type": "string",
+      "title": "Asunto"
+    },
+    "estado": {
+      "type": "string",
+      "title": "Estado",
+      "enum": ["Enviado", "Abierto", "Respondido", "Rebotado"],
+      "default": "Enviado"
+    },
+    "fecha_envio": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha de envio"
+    },
+    "fecha_apertura": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha de apertura"
+    },
+    "fecha_respuesta": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha de respuesta"
+    },
+    "tracking_id": {
+      "type": "string",
+      "title": "Tracking ID",
+      "description": "UUID unico para el pixel de tracking de apertura"
+    }
+  },
+  "required": ["contacto_id", "email_destino", "asunto", "tracking_id"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

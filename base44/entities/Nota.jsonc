@@ -1,0 +1,38 @@
+{
+  "name": "Nota",
+  "type": "object",
+  "properties": {
+    "cliente_id": {
+      "type": "string",
+      "description": "Legacy: ID del cliente (entidad Cliente antigua). No usar en notas nuevas."
+    },
+    "contacto_id": {
+      "type": "string",
+      "description": "Referencia a Contacto"
+    },
+    "empresa_id": {
+      "type": "string",
+      "description": "Referencia a Empresa"
+    },
+    "oportunidad_id": {
+      "type": "string",
+      "description": "Referencia a Oportunidad"
+    },
+    "texto": {
+      "type": "string",
+      "description": "Contenido de la nota"
+    },
+    "fecha_nota": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora de la nota"
+    },
+    "gmail_message_id": {
+      "type": "string",
+      "description": "ID del mensaje en Gmail. Para deduplicar notas creadas automaticamente desde correos recibidos."
+    }
+  },
+  "required": [
+    "texto"
+  ]
+}

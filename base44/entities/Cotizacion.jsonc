@@ -1,0 +1,202 @@
+{
+  "name": "Cotizacion",
+  "type": "object",
+  "properties": {
+    "numero": {
+      "type": "string",
+      "title": "Número",
+      "description": "Consecutivo COT-2026-001"
+    },
+    "tipo": {
+      "type": "string",
+      "title": "Tipo",
+      "enum": ["hardware", "software"],
+      "default": "hardware",
+      "description": "hardware = con IVA 19%; software = exento (IVA 0%)"
+    },
+    "sw_activos": {
+      "type": "number",
+      "title": "Software: cantidad de activos"
+    },
+    "sw_usuarios": {
+      "type": "number",
+      "title": "Software: cantidad de usuarios"
+    },
+    "sw_periodicidad": {
+      "type": "string",
+      "title": "Software: periodicidad",
+      "enum": ["mensual", "anual"],
+      "default": "mensual"
+    },
+    "sw_modulo": {
+      "type": "string",
+      "title": "Software: módulo",
+      "enum": ["inventarios", "samm"],
+      "default": "inventarios",
+      "description": "inventarios = tracking de activos/tags; samm = plataforma de mantenimiento y activos (CMMS/EAM)"
+    },
+    "sw_gigas": {
+      "type": "number",
+      "title": "SAMM: Gigas de almacenamiento"
+    },
+    "sw_solicitudes": {
+      "type": "number",
+      "title": "SAMM: solicitudes de soporte al mes"
+    },
+    "empresa_id": {
+      "type": "string",
+      "title": "Empresa",
+      "description": "Referencia a Empresa"
+    },
+    "oportunidad_id": {
+      "type": "string",
+      "title": "Oportunidad",
+      "description": "Referencia a Oportunidad"
+    },
+    "contacto_id": {
+      "type": "string",
+      "title": "Contacto destinatario",
+      "description": "Debe tener email para poder enviarla"
+    },
+    "firmado_por": {
+      "type": "string",
+      "title": "Firmada por (email)",
+      "description": "Email del usuario que firma; determina qué firma aparece en el PDF"
+    },
+    "estado": {
+      "type": "string",
+      "title": "Estado",
+      "enum": ["Borrador", "Enviada", "Aceptada", "Rechazada", "Vencida"],
+      "default": "Borrador"
+    },
+    "moneda": {
+      "type": "string",
+      "title": "Moneda",
+      "enum": ["COP", "USD"],
+      "default": "COP"
+    },
+    "fecha_emision": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de emisión"
+    },
+    "validez_dias": {
+      "type": "number",
+      "title": "Validez (días)",
+      "default": 15
+    },
+    "fecha_vencimiento": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de vencimiento"
+    },
+    "items": {
+      "type": "array",
+      "title": "Ítems",
+      "items": {
+        "type": "object",
+        "properties": {
+          "producto_id": { "type": "string" },
+          "producto_nombre": { "type": "string" },
+          "descripcion": { "type": "string" },
+          "cantidad": { "type": "number" },
+          "precio_unitario": { "type": "number" },
+          "descuento_pct": { "type": "number" },
+          "total_linea": { "type": "number" }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number",
+      "title": "Subtotal"
+    },
+    "descuento_total": {
+      "type": "number",
+      "title": "Descuento total"
+    },
+    "iva_pct": {
+      "type": "number",
+      "title": "IVA %",
+      "default": 19,
+      "description": "Editable; 0 para exentos"
+    },
+    "iva_valor": {
+      "type": "number",
+      "title": "Valor IVA"
+    },
+    "total": {
+      "type": "number",
+      "title": "Total"
+    },
+    "condiciones_pago": {
+      "type": "string",
+      "title": "Condiciones de pago"
+    },
+    "tiempo_entrega": {
+      "type": "string",
+      "title": "Tiempo de entrega"
+    },
+    "notas": {
+      "type": "string",
+      "title": "Notas / comentario extra"
+    },
+    "texto_validez": {
+      "type": "string",
+      "title": "Texto 2. Validez de la oferta",
+      "description": "Texto de la sección 2 del PDF, editable por cotización. Vacío = la sección no se imprime. Cada salto de línea es un párrafo."
+    },
+    "texto_contrato": {
+      "type": "string",
+      "title": "Texto 3. Contrato",
+      "description": "Texto de la sección 3 del PDF, editable por cotización. Vacío = la sección no se imprime."
+    },
+    "texto_metodologia": {
+      "type": "string",
+      "title": "Texto 4. Metodología de trabajo",
+      "description": "Texto de la sección 4 del PDF, editable por cotización. Vacío = la sección no se imprime."
+    },
+    "titulo_validez": {
+      "type": "string",
+      "title": "Título de la sección 2",
+      "description": "Título editable de la sección de validez. Vacío = VALIDEZ DE LA OFERTA. El número se pone solo."
+    },
+    "titulo_contrato": {
+      "type": "string",
+      "title": "Título de la sección 3",
+      "description": "Título editable de la sección de contrato. Vacío = CONTRATO. El número se pone solo."
+    },
+    "titulo_metodologia": {
+      "type": "string",
+      "title": "Título de la sección 4",
+      "description": "Título editable de la sección de metodología. Vacío = METODOLOGÍA DE TRABAJO. El número se pone solo."
+    },
+    "textos_propios": {
+      "type": "boolean",
+      "title": "Textos propios",
+      "default": false,
+      "description": "true = las secciones 2, 3 y 4 salen de texto_validez/contrato/metodologia (aunque estén vacíos). false o ausente = cotización vieja, imprime los textos predeterminados de siempre."
+    },
+    "costo_envio": {
+      "type": "number",
+      "title": "Costo de envío",
+      "default": 0,
+      "description": "Costo de envío/transporte (ej. envío de tags a otra parte de la ciudad). Se suma al total."
+    },
+    "enviada_a": {
+      "type": "string",
+      "title": "Enviada a (email)"
+    },
+    "fecha_envio": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha de envío"
+    }
+  },
+  "required": ["numero", "empresa_id"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

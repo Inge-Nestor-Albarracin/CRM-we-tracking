@@ -1,0 +1,18 @@
+{
+  "name": "MiembroEquipo",
+  "type": "object",
+  "properties": {
+    "nombre": { "type": "string", "title": "Nombre" },
+    "email": { "type": "string", "title": "Correo" },
+    "cargo": { "type": "string", "title": "Cargo" },
+    "activo": { "type": "boolean", "title": "Activo", "default": true },
+    "orden": { "type": "number", "title": "Orden" }
+  },
+  "required": ["nombre"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

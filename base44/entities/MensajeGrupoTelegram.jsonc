@@ -1,0 +1,39 @@
+{
+  "name": "MensajeGrupoTelegram",
+  "type": "object",
+  "properties": {
+    "chat_id": {
+      "type": "string",
+      "title": "ID del chat/grupo"
+    },
+    "chat_titulo": {
+      "type": "string",
+      "title": "Nombre del grupo"
+    },
+    "remitente": {
+      "type": "string",
+      "title": "Quién lo envió"
+    },
+    "texto": {
+      "type": "string",
+      "title": "Mensaje"
+    },
+    "fecha": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha"
+    },
+    "message_id": {
+      "type": "string",
+      "title": "ID del mensaje en Telegram",
+      "description": "Para deduplicar"
+    }
+  },
+  "required": ["texto"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

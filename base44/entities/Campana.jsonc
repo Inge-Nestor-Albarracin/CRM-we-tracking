@@ -1,0 +1,70 @@
+{
+  "name": "Campana",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "title": "Nombre de la campaña"
+    },
+    "asunto": {
+      "type": "string",
+      "title": "Asunto del email"
+    },
+    "plantilla_id": {
+      "type": "string",
+      "title": "ID de plantilla"
+    },
+    "estado": {
+      "type": "string",
+      "title": "Estado",
+      "enum": ["Borrador", "Programada", "Enviando", "Enviada", "Pausada"],
+      "default": "Borrador"
+    },
+    "fecha_programada": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha programada de envio"
+    },
+    "segmento_id": {
+      "type": "string",
+      "title": "Segmento de destinatarios",
+      "description": "Referencia a un Segmento guardado (listas por criterios)"
+    },
+    "segmento": {
+      "type": "object",
+      "title": "Segmento inline (legacy)",
+      "description": "Filtros JSON legacy { sector, etapa_pipeline, ciudad }; usar segmento_id en campañas nuevas"
+    },
+    "total_enviados": {
+      "type": "number",
+      "title": "Total enviados",
+      "default": 0
+    },
+    "total_abiertos": {
+      "type": "number",
+      "title": "Total abiertos",
+      "default": 0
+    },
+    "total_respondidos": {
+      "type": "number",
+      "title": "Total respondidos",
+      "default": 0
+    },
+    "total_rebotados": {
+      "type": "number",
+      "title": "Total rebotados",
+      "default": 0
+    },
+    "creado_por": {
+      "type": "string",
+      "title": "Creado por"
+    }
+  },
+  "required": ["nombre", "asunto"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

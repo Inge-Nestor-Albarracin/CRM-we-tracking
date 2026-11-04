@@ -1,0 +1,49 @@
+// Devuelve el contenido completo de un correo de la cuenta Gmail adicional (conector "WeTracking Gmail Karen") y lo marca como leído.
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { jsonRes, decodeB64Url, extraerCuerpoParts } from "../../shared/gmailUtils.ts";
+
+const GMAIL_KAREN_CONNECTOR_ID = '6a739cba0cfbf2c423f6d6f2';
+
+Deno.serve(async (req) => {
+  if (req.method !== 'POST') return jsonRes({ error: 'Solo POST' }, 405);
+  let body: any = {};
+  try { body = await req.json(); } catch { /* */ }
+  const id = String(body.id || '');
+  if (!id) return jsonRes({ error: 'Falta id' }, 400);
+
+  try {
+    const b44 = createClientFromRequest(req);
+    const user = await b44.auth.me();
+    if (!user) return jsonRes({ error: 'Unauthorized' }, 401);
+
+    let accessToken: string | undefined;
+    try {
+      const conn = await b44.asServiceRole.connectors.getCurrentAppUserConnection(GMAIL_KAREN_CONNECTOR_ID);
+      accessToken = conn?.accessToken;
+    } catch { return jsonRes({ error: 'Gmail (Karen) no conectado' }); }
+    if (!accessToken) return jsonRes({ error: 'Gmail (Karen) no conectado' });
+
+    const hdr = { Authorization: `Bearer ${accessToken}` };
+    const r = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`, { headers: hdr });
+    if (!r.ok) return jsonRes({ error: `mensaje ${r.status}` });
+    const m = await r.json();
+    const hs: Record<string, string> = {};
+    (m.payload?.headers || []).forEach((h: any) => { hs[String(h.name).toLowerCase()] = h.value; });
+    const { html, texto } = extraerCuerpoParts(m.payload || {});
+
+    try {
+      await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}/modify`, {
+        method: 'POST', headers: { ...hdr, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ removeLabelIds: ['UNREAD'] }),
+      });
+    } catch { /* no crítico */ }
+
+    return jsonRes({
+      from: hs.from || '', to: hs.to || '', subject: hs.subject || '(sin asunto)',
+      date: hs.date || '', html, texto: texto || m.snippet || '',
+      threadId: m.threadId || id, messageId: hs['message-id'] || '',
+    });
+  } catch (e) {
+    return jsonRes({ error: String((e as Error).message || e).slice(0, 200) });
+  }
+});

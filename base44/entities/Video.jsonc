@@ -1,0 +1,52 @@
+{
+  "name": "Video",
+  "type": "object",
+  "properties": {
+    "titulo": {
+      "type": "string",
+      "title": "Título"
+    },
+    "categoria": {
+      "type": "string",
+      "title": "Categoría",
+      "enum": ["Redes", "Caso_Exito", "Informativo", "Producto", "Otro"],
+      "default": "Informativo"
+    },
+    "tipo": {
+      "type": "string",
+      "title": "Tipo de fuente",
+      "enum": ["link", "archivo"],
+      "default": "link",
+      "description": "link = YouTube/Drive; archivo = mp4 subido"
+    },
+    "url": {
+      "type": "string",
+      "title": "URL",
+      "description": "Link de YouTube/Drive o URL del archivo subido (UploadFile)"
+    },
+    "tipo_mime": {
+      "type": "string",
+      "description": "Tipo MIME si es archivo (ej. video/mp4)"
+    },
+    "portada_url": {
+      "type": "string",
+      "title": "Portada",
+      "description": "URL de una imagen de portada/thumbnail opcional para la tarjeta"
+    },
+    "descripcion": {
+      "type": "string",
+      "title": "Descripción"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": ["titulo", "url"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

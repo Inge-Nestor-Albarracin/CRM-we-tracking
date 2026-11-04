@@ -1,0 +1,78 @@
+{
+  "name": "Oportunidad",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "title": "Nombre del negocio",
+      "description": "Ej: RFID bodega Funza, Activos fijos sede admin"
+    },
+    "empresa_id": {
+      "type": "string",
+      "title": "Empresa",
+      "description": "Referencia a Empresa"
+    },
+    "etapa": {
+      "type": "string",
+      "title": "Etapa",
+      "enum": ["Visita_Inicial", "Creacion_Cotizacion", "Cotizacion_Enviada", "Visita_Post_Cotizacion", "Decisor_Convencido", "Cierre_Ganado", "Cierre_Perdido"],
+      "default": "Visita_Inicial",
+      "description": "Etapas del pipeline comercial de WeTracking (mismas de HubSpot)"
+    },
+    "valor_estimado": {
+      "type": "number",
+      "title": "Valor estimado"
+    },
+    "moneda": {
+      "type": "string",
+      "title": "Moneda",
+      "enum": ["COP", "USD"],
+      "default": "COP"
+    },
+    "tipo_solucion": {
+      "type": "string",
+      "title": "Tipo de solución",
+      "enum": ["Activos", "Inventarios", "Locativos", "Otro"]
+    },
+    "contacto_id": {
+      "type": "string",
+      "title": "Contacto principal",
+      "description": "Referencia a Contacto"
+    },
+    "responsable": {
+      "type": "string",
+      "title": "Responsable",
+      "description": "Email del comercial responsable"
+    },
+    "fecha_cierre_estimada": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de cierre estimada"
+    },
+    "fecha_cierre_real": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de cierre real"
+    },
+    "motivo_perdida": {
+      "type": "string",
+      "title": "Motivo de pérdida"
+    },
+    "origen": {
+      "type": "string",
+      "title": "Origen",
+      "description": "WhatsApp / Referido / Web / Evento / Frío"
+    },
+    "descripcion": {
+      "type": "string",
+      "title": "Descripción"
+    }
+  },
+  "required": ["nombre"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

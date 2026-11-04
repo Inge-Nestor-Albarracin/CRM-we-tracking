@@ -1,0 +1,47 @@
+{
+  "name": "Segmento",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "title": "Nombre del segmento"
+    },
+    "tipo": {
+      "type": "string",
+      "title": "Tipo de segmento",
+      "enum": ["contacto", "empresa"],
+      "default": "contacto",
+      "description": "contacto = filtra contactos; empresa = filtra empresas (destinatarios = sus contactos)"
+    },
+    "descripcion": {
+      "type": "string",
+      "title": "Descripción"
+    },
+    "logica": {
+      "type": "string",
+      "title": "Lógica",
+      "enum": ["AND", "OR"],
+      "default": "AND",
+      "description": "AND = cumple todos los criterios; OR = cumple cualquiera"
+    },
+    "filtros": {
+      "type": "array",
+      "title": "Criterios de filtro",
+      "items": {
+        "type": "object",
+        "properties": {
+          "campo": { "type": "string" },
+          "operador": { "type": "string" },
+          "valor": { "type": "string" }
+        }
+      }
+    }
+  },
+  "required": ["nombre"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

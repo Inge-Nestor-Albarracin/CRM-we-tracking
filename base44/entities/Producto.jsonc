@@ -1,0 +1,91 @@
+{
+  "name": "Producto",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "title": "Nombre",
+      "description": "Ej: Tag UHF adhesivo 902-928MHz"
+    },
+    "sku": {
+      "type": "string",
+      "title": "SKU"
+    },
+    "categoria": {
+      "type": "string",
+      "title": "Categoría",
+      "enum": ["Tags_RFID", "Lectores", "Antenas", "Impresoras", "Software", "Servicios", "Otro"]
+    },
+    "tipo_rfid": {
+      "type": "string",
+      "title": "Tipo de RFID",
+      "enum": ["NFC", "HF", "UHF"],
+      "description": "Tecnología RFID del producto"
+    },
+    "foto": {
+      "type": "string",
+      "title": "Foto",
+      "description": "URL de la imagen del producto (vía UploadFile)"
+    },
+    "descripcion": {
+      "type": "string",
+      "title": "Descripción"
+    },
+    "superficie": {
+      "type": "string",
+      "title": "Superficie",
+      "enum": ["Metal", "No metal", "Ambos"],
+      "description": "Sobre qué superficie funciona el tag"
+    },
+    "temp_max": {
+      "type": "number",
+      "title": "Temperatura máx (°C)",
+      "description": "Temperatura máxima que resiste"
+    },
+    "rango_m": {
+      "type": "number",
+      "title": "Rango de lectura (m)",
+      "description": "Distancia máxima de lectura en metros"
+    },
+    "entorno": {
+      "type": "string",
+      "title": "Entorno",
+      "description": "Interior/exterior, industrial, húmedo, etc."
+    },
+    "aplicacion": {
+      "type": "string",
+      "title": "Aplicación típica",
+      "description": "Activos, herramientas, textil, vehículos, personas, inventario..."
+    },
+    "precio_venta": {
+      "type": "number",
+      "title": "Precio de venta (COP)"
+    },
+    "costo": {
+      "type": "number",
+      "title": "Costo (COP)"
+    },
+    "stock_minimo": {
+      "type": "number",
+      "title": "Stock mínimo",
+      "default": 0
+    },
+    "unidad": {
+      "type": "string",
+      "title": "Unidad",
+      "default": "unidad"
+    },
+    "activo": {
+      "type": "boolean",
+      "title": "Activo",
+      "default": true
+    }
+  },
+  "required": ["nombre"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "ConfigEvaluador",
+  "type": "object",
+  "properties": {
+    "como_trabaja": { "type": "string", "title": "Cómo debe trabajar Emma (reglas contra las que compara el juez)" },
+    "crit_calificacion": { "type": "string", "title": "Criterio: Calificación" },
+    "crit_humanizacion": { "type": "string", "title": "Criterio: Humanización" },
+    "crit_rapidez": { "type": "string", "title": "Criterio: Rapidez" },
+    "crit_cierre": { "type": "string", "title": "Criterio: Cierre" },
+    "instrucciones_juez": { "type": "string", "title": "Instrucciones extra para el juez" },
+    "modelo": { "type": "string", "title": "Modelo del juez", "default": "claude_opus_4_8" },
+    "pausa_ms": { "type": "number", "title": "Pausa entre chats (ms)", "default": 300 },
+    "criterios": { "type": "string", "title": "Criterios (legacy)" }
+  },
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "name": "ReunionNota",
+  "type": "object",
+  "properties": {
+    "titulo": {
+      "type": "string",
+      "title": "T\u00edtulo"
+    },
+    "fecha_reunion": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de la reuni\u00f3n"
+    },
+    "tipo": {
+      "type": "string",
+      "title": "Tipo",
+      "enum": [
+        "Comite_Comercial",
+        "Reunion_Cliente",
+        "Otro"
+      ],
+      "default": "Otro"
+    },
+    "origen": {
+      "type": "string",
+      "title": "Origen",
+      "enum": [
+        "Manual",
+        "Google_Drive",
+        "Gmail",
+        "Microsoft_Teams",
+        "OneDrive"
+      ],
+      "default": "Manual"
+    },
+    "doc_id": {
+      "type": "string",
+      "title": "ID del doc en Drive/Teams/OneDrive",
+      "description": "Para deduplicar en el sync (Drive file id, teams_{transcriptId}, onedrive_{fileId})"
+    },
+    "gmail_message_id": {
+      "type": "string",
+      "title": "ID del mensaje en Gmail",
+      "description": "Para deduplicar el sync desde Gmail"
+    },
+    "remitente": {
+      "type": "string",
+      "title": "Remitente del correo",
+      "description": "From del email cuando origen = Gmail"
+    },
+    "doc_url": {
+      "type": "string",
+      "title": "URL del doc"
+    },
+    "doc_modified_time": {
+      "type": "string",
+      "title": "modifiedTime del doc (RFC3339)"
+    },
+    "contenido_url": {
+      "type": "string",
+      "title": "URL del contenido crudo",
+      "description": "UploadFile con el texto completo (solo origen Manual)"
+    },
+    "extracto": {
+      "type": "string",
+      "title": "Extracto",
+      "description": "Primeros ~800 caracteres para preview"
+    },
+    "resumen": {
+      "type": "string",
+      "title": "Resumen ejecutivo (IA)"
+    },
+    "acta_md": {
+      "type": "string",
+      "title": "Acta formal (Markdown, IA)",
+      "description": "Acta de reuni\u00f3n completa en formato WeTracking"
+    },
+    "research_tags_md": {
+      "type": "string",
+      "title": "Research de tags (Gemini)",
+      "description": "Lista de tags recomendados investigada con Gemini 2.5 Pro"
+    },
+    "asistentes": {
+      "type": "array",
+      "title": "Asistentes",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "cargo": {
+            "type": "string"
+          },
+          "empresa": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "decisiones": {
+      "type": "array",
+      "title": "Decisiones",
+      "items": {
+        "type": "string"
+      }
+    },
+    "action_items": {
+      "type": "array",
+      "title": "Action items",
+      "items": {
+        "type": "object",
+        "properties": {
+          "descripcion": {
+            "type": "string"
+          },
+          "responsable": {
+            "type": "string"
+          },
+          "fecha_limite": {
+            "type": "string"
+          },
+          "tarea_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "empresa_id": {
+      "type": "string",
+      "title": "Empresa vinculada"
+    },
+    "oportunidad_id": {
+      "type": "string",
+      "title": "Oportunidad vinculada"
+    },
+    "contactos_ids": {
+      "type": "array",
+      "title": "Contactos vinculados",
+      "items": {
+        "type": "string"
+      }
+    },
+    "empresas_detectadas": {
+      "type": "array",
+      "title": "Empresas detectadas sin match",
+      "items": {
+        "type": "string"
+      }
+    },
+    "contactos_detectados": {
+      "type": "array",
+      "title": "Contactos detectados sin match",
+      "items": {
+        "type": "string"
+      }
+    },
+    "estado_procesamiento": {
+      "type": "string",
+      "title": "Estado de procesamiento",
+      "enum": [
+        "Pendiente",
+        "Procesando",
+        "Procesado",
+        "Error"
+      ],
+      "default": "Pendiente"
+    },
+    "error_procesamiento": {
+      "type": "string",
+      "title": "Error de procesamiento"
+    },
+    "descartada": {
+      "type": "boolean",
+      "default": false,
+      "title": "Descartada",
+      "description": "Borrado suave: se oculta de la lista y la sync NO la vuelve a crear (mantiene el doc_id para dedup)"
+    },
+    "sugerencia_estado": {
+      "type": "string",
+      "title": "Estado de la sugerencia de prospecto",
+      "enum": [
+        "ninguna",
+        "pendiente",
+        "confirmada",
+        "ignorada"
+      ],
+      "default": "ninguna",
+      "description": "Flujo de confirmaci\u00f3n cuando la reuni\u00f3n detecta un prospecto nuevo (empresa/contacto que no est\u00e1 en el CRM)"
+    },
+    "sugerencia_json": {
+      "type": "string",
+      "title": "Sugerencia de prospecto (JSON)",
+      "description": "JSON del prospecto nuevo detectado: { empresa_nombre, contactos:[{nombre,email,cargo}] }"
+    }
+  },
+  "required": [
+    "titulo"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

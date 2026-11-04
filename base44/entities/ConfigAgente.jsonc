@@ -1,0 +1,121 @@
+{
+  "name": "ConfigAgente",
+  "type": "object",
+  "properties": {
+    "clave": {
+      "type": "string",
+      "description": "Clave \u00fanica (usar 'general')"
+    },
+    "nombre_agente": {
+      "type": "string",
+      "default": "Valentina",
+      "description": "Nombre del agente de IA"
+    },
+    "nombre_inmobiliaria": {
+      "type": "string",
+      "description": "Nombre de la inmobiliaria"
+    },
+    "instrucciones_sistema": {
+      "type": "string",
+      "description": "System prompt con personalidad, flujo y reglas del agente"
+    },
+    "aprendizajes": {
+      "type": "string",
+      "description": "Bloque de APRENDIZAJES VALIDADOS que se inyecta al prompt de Emma (autoeducaci\u00f3n)"
+    },
+    "demora_segundos": {
+      "type": "number",
+      "description": "Demora antes de enviar la respuesta (cola + cron). Default 60."
+    },
+    "conocimiento_base": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "FAQs, pol\u00edticas y datos que el agente debe conocer (RAG)"
+    },
+    "saludo_inicial": {
+      "type": "string",
+      "description": "Mensaje de saludo inicial. Usa {{nombre}}, {{agente}}, {{inmobiliaria}}"
+    },
+    "horario_inicio": {
+      "type": "string",
+      "default": "08:00",
+      "description": "Hora inicio de atenci\u00f3n (HH:MM)"
+    },
+    "horario_fin": {
+      "type": "string",
+      "default": "20:00",
+      "description": "Hora fin de atenci\u00f3n (HH:MM)"
+    },
+    "fuera_de_horario_mensaje": {
+      "type": "string",
+      "description": "Mensaje autom\u00e1tico fuera del horario de atenci\u00f3n"
+    },
+    "escalar_triggers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Palabras clave que disparan escalaci\u00f3n a un humano"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si el agente responde autom\u00e1ticamente"
+    },
+    "brokers": {
+      "type": "array",
+      "default": [],
+      "description": "Lista de asesores/brokers con su tipo de inmueble y barrios asignados",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "description": "Nombre del asesor"
+          },
+          "telefono": {
+            "type": "string",
+            "description": "Tel\u00e9fono con c\u00f3digo de pa\u00eds, sin + (ej: 573105771576)"
+          },
+          "tipo_inmueble": {
+            "type": "string",
+            "enum": [
+              "vivienda",
+              "comercial",
+              "ambos"
+            ],
+            "default": "ambos",
+            "description": "Tipo de inmueble que maneja este asesor"
+          },
+          "barrios": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Barrios asignados (vac\u00edo = todos los del tipo)"
+          }
+        }
+      }
+    },
+    "industrias_excluidas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Industrias donde WeTracking NO opera. Emma descalifica (con calidad) leads de estas industrias."
+    },
+    "telegram_grupo_chat_id": {
+      "type": "string",
+      "description": "chat_id del grupo interno de Telegram donde Emma consulta disponibilidad de agenda al equipo"
+    }
+  },
+  "required": [
+    "clave"
+  ]
+}

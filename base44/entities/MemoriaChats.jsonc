@@ -1,0 +1,80 @@
+{
+  "name": "MemoriaChats",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "title": "Nombre",
+      "description": "Identificador de la sesion de chat (ej: 'Test 2026-07-01 10:30')"
+    },
+    "estado_json": {
+      "type": "string",
+      "title": "Estado JSON",
+      "description": "JSON stringificado con el estado completo de la conversacion: historial, datos del lead, etapa, calificacion, broker asignado, objeciones, etc."
+    },
+    "fecha_inicio": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha inicio"
+    },
+    "fecha_ultima_actualizacion": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha ultima actualizacion"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true,
+      "title": "Activo"
+    }
+  },
+  "required": [
+    "nombre",
+    "estado_json"
+  ],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

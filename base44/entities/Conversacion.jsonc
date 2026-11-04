@@ -1,0 +1,114 @@
+{
+  "name": "Conversacion",
+  "type": "object",
+  "properties": {
+    "contacto_id": {
+      "type": "string",
+      "title": "Contacto ID",
+      "description": "ID del contacto (referencia a Contacto)"
+    },
+    "contacto_nombre": {
+      "type": "string",
+      "title": "Nombre del contacto"
+    },
+    "contacto_telefono": {
+      "type": "string",
+      "title": "Telefono del contacto"
+    },
+    "canal": {
+      "type": "string",
+      "title": "Canal",
+      "enum": [
+        "WhatsApp",
+        "Web",
+        "Telefono",
+        "Otro"
+      ],
+      "default": "WhatsApp"
+    },
+    "estado": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "IA_Activa",
+        "Asignada",
+        "Cerrada",
+        "Pendiente"
+      ],
+      "default": "IA_Activa"
+    },
+    "ia_activa": {
+      "type": "boolean",
+      "default": true,
+      "title": "IA activa"
+    },
+    "fecha_inicio": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha inicio"
+    },
+    "fecha_ultimo_mensaje": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha ultimo mensaje"
+    },
+    "mensajes_sin_leer": {
+      "type": "integer",
+      "default": 0,
+      "title": "Mensajes sin leer"
+    },
+    "broker_asignado": {
+      "type": "string",
+      "title": "Broker asignado"
+    }
+  },
+  "required": [
+    "contacto_id",
+    "canal"
+  ],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

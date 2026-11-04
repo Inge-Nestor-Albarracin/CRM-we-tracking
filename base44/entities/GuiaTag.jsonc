@@ -1,0 +1,42 @@
+{
+  "name": "GuiaTag",
+  "type": "object",
+  "properties": {
+    "escenario": {
+      "type": "string",
+      "title": "Escenario / necesidad",
+      "description": "Ej: Activos metálicos a la intemperie"
+    },
+    "condiciones": {
+      "type": "string",
+      "title": "Condiciones",
+      "description": "Ej: metal, exterior, agua, alta temperatura"
+    },
+    "sector": {
+      "type": "string",
+      "title": "Sector",
+      "description": "Opcional: bodegas, clubes, industria, etc."
+    },
+    "tag_recomendado": {
+      "type": "string",
+      "title": "Tag / producto recomendado",
+      "description": "Nombre del producto o tipo de tag recomendado"
+    },
+    "por_que": {
+      "type": "string",
+      "title": "Por qué",
+      "description": "Justificación técnica de la recomendación"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": ["escenario", "tag_recomendado"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

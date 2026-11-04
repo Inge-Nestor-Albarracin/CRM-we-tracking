@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "rol": {
+      "type": "string",
+      "enum": [
+        "Admin",
+        "Comercial"
+      ],
+      "title": "Rol"
+    },
+    "nombre": {
+      "type": "string",
+      "title": "Nombre"
+    },
+    "cargo": {
+      "type": "string",
+      "title": "Cargo (para la firma de cotizaciones)"
+    },
+    "firma_url": {
+      "type": "string",
+      "title": "URL de la firma (imagen, para cotizaciones)"
+    }
+  },
+  "required": [
+    "email",
+    "rol"
+  ],
+  "name": "PerfilUsuario"
+}

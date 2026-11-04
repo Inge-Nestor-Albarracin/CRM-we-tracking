@@ -1,0 +1,24 @@
+{
+  "name": "Actividad",
+  "type": "object",
+  "properties": {
+    "empresa_id": { "type": "string", "title": "Empresa" },
+    "contacto_id": { "type": "string", "title": "Contacto" },
+    "oportunidad_id": { "type": "string", "title": "Oportunidad" },
+    "tipo": { "type": "string", "title": "Tipo", "description": "edicion, negocio, cotizacion, documento, contacto, etapa, vinculo, nota, tarea, email, reunion" },
+    "descripcion": { "type": "string", "title": "Descripción" },
+    "campo": { "type": "string", "title": "Campo editado" },
+    "valor_anterior": { "type": "string", "title": "Valor anterior" },
+    "valor_nuevo": { "type": "string", "title": "Valor nuevo" },
+    "fecha": { "type": "string", "format": "date-time", "title": "Fecha" },
+    "usuario_email": { "type": "string", "title": "Usuario (email)" },
+    "usuario_nombre": { "type": "string", "title": "Usuario (nombre)" }
+  },
+  "required": ["tipo"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

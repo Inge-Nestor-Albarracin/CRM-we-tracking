@@ -1,0 +1,76 @@
+{
+  "name": "Tarea",
+  "type": "object",
+  "properties": {
+    "cliente_id": {
+      "type": "string",
+      "description": "Legacy: ID del cliente (entidad Cliente antigua). No usar en tareas nuevas."
+    },
+    "contacto_id": {
+      "type": "string",
+      "description": "Referencia a Contacto"
+    },
+    "empresa_id": {
+      "type": "string",
+      "description": "Referencia a Empresa"
+    },
+    "oportunidad_id": {
+      "type": "string",
+      "description": "Referencia a Oportunidad"
+    },
+    "reunion_nota_id": {
+      "type": "string",
+      "description": "Referencia a ReunionNota (si la tarea salio de una reunion)"
+    },
+    "titulo": {
+      "type": "string",
+      "description": "Título de la tarea"
+    },
+    "descripcion": {
+      "type": "string",
+      "description": "Descripción detallada"
+    },
+    "fecha_limite": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha límite para completar"
+    },
+    "hora": {
+      "type": "string",
+      "description": "Hora opcional (HH:mm)"
+    },
+    "completada": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si la tarea está completada"
+    },
+    "asignado_a": {
+      "type": "string",
+      "description": "Email del usuario asignado"
+    },
+    "responsable": {
+      "type": "string",
+      "description": "Nombre del responsable (útil cuando no es un usuario del sistema, p. ej. un cliente)"
+    },
+    "ambito": {
+      "type": "string",
+      "enum": ["equipo", "cliente"],
+      "default": "equipo",
+      "description": "equipo = tarea de nuestro equipo WeTracking; cliente = tarea de un cliente/prospecto/externo"
+    },
+    "prioridad": {
+      "type": "string",
+      "enum": [
+        "Baja",
+        "Media",
+        "Alta"
+      ],
+      "default": "Media",
+      "description": "Prioridad de la tarea"
+    }
+  },
+  "required": [
+    "titulo",
+    "fecha_limite"
+  ]
+}

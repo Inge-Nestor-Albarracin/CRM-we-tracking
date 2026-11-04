@@ -1,0 +1,96 @@
+{
+  "name": "ConocimientoRAG",
+  "type": "object",
+  "properties": {
+    "titulo": {
+      "type": "string",
+      "title": "Titulo",
+      "description": "Titulo corto identificador del conocimiento"
+    },
+    "contenido": {
+      "type": "string",
+      "title": "Contenido",
+      "description": "Texto del conocimiento que usa Valentina como RAG"
+    },
+    "categoria": {
+      "type": "string",
+      "title": "Categoria",
+      "enum": [
+        "avatar",
+        "principios",
+        "frases",
+        "conversaciones",
+        "antideteccion",
+        "mercado",
+        "general"
+      ],
+      "description": "Categoria del conocimiento RAG"
+    },
+    "etapas": {
+      "type": "string",
+      "title": "Etapas",
+      "description": "Etapas del pipeline donde aplica (ej: 'todas', 'cualificacion', 'presentacion')"
+    },
+    "prioridad": {
+      "type": "integer",
+      "default": 5,
+      "title": "Prioridad",
+      "description": "Prioridad del conocimiento (1-10, mayor = mas relevante)"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true,
+      "title": "Activo",
+      "description": "Si el conocimiento esta activo para ser usado por el agente"
+    }
+  },
+  "required": [
+    "titulo",
+    "contenido"
+  ],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

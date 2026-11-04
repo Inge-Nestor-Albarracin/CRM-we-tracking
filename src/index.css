@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Abril+Fatface:wght@400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+
+    /* iOS Clásico — Light */
+    --background: 240 6% 97%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 211 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 211 100% 50%;
+    --chart-1: 211 100% 50%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 145 63% 42%;
+    --chart-4: 262 83% 58%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.875rem;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 211 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 6% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 211 100% 50%;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 58%;
+    --accent: 211 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 211 100% 50%;
+    --chart-1: 211 100% 50%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 145 63% 42%;
+    --chart-4: 262 83% 58%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 211 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 16%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 211 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* iOS-style scrollbar — thin and subtle */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(240 5% 80%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(240 5% 70%);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 30%);
+}
+/* ── FullCalendar (calendario del Perfil) ───────────────────────────── */
+.wt-fc .fc { font-size: 0.82rem; }
+.wt-fc .fc .fc-toolbar-title { font-size: 1.05rem; font-weight: 600; }
+.wt-fc .fc .fc-toolbar.fc-header-toolbar { margin-bottom: 0.75rem; }
+.wt-fc .fc .fc-button {
+  text-transform: none; font-size: 0.78rem; padding: 0.32rem 0.62rem;
+  box-shadow: none; border-radius: 0.5rem;
+}
+.wt-fc .fc .fc-col-header-cell-cushion,
+.wt-fc .fc .fc-daygrid-day-number { color: inherit; text-decoration: none; }
+.wt-fc .fc-event { cursor: pointer; border: none; font-weight: 500; }
+.wt-fc .fc .fc-highlight { background: hsl(var(--primary) / 0.15); }
+.wt-fc .fc .fc-day-today { background: hsl(var(--primary) / 0.07) !important; }
+
+/* Botones con el azul primario del sistema */
+.wt-fc .fc .fc-button-primary {
+  --fc-button-bg-color: hsl(var(--primary));
+  --fc-button-border-color: hsl(var(--primary));
+  --fc-button-hover-bg-color: hsl(var(--primary));
+  --fc-button-hover-border-color: hsl(var(--primary));
+  --fc-button-active-bg-color: hsl(var(--primary));
+  --fc-button-active-border-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* Modo oscuro */
+.dark .wt-fc .fc {
+  --fc-border-color: hsl(var(--border));
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: hsl(var(--muted));
+  --fc-today-bg-color: hsl(var(--primary) / 0.12);
+  --fc-list-event-hover-bg-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+.dark .wt-fc .fc-theme-standard td,
+.dark .wt-fc .fc-theme-standard th,
+.dark .wt-fc .fc-scrollgrid,
+.dark .wt-fc .fc-scrollgrid td { border-color: hsl(var(--border)); }
+
+/* El popover de FullCalendar ("+2 más") trae z-index 9999 de fábrica. Se baja para que quede
+   por debajo de la barra superior (z-30) y de las ventanas modales (z-50), sin taparlas. */
+.wt-fc .fc .fc-popover,
+.wt-fc .fc-popover { z-index: 25; }

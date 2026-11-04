@@ -1,0 +1,27 @@
+{
+  "name": "Aprendizaje",
+  "type": "object",
+  "properties": {
+    "regla": { "type": "string", "title": "Regla aprendida" },
+    "estado": {
+      "type": "string",
+      "title": "Estado",
+      "enum": ["pendiente", "aprobada", "rechazada"],
+      "default": "pendiente"
+    },
+    "categoria": {
+      "type": "string",
+      "title": "Categoría",
+      "description": "humanizacion / calificacion / cierre / rapidez / general"
+    },
+    "soporte": { "type": "number", "title": "Evaluaciones que lo respaldan" },
+    "fecha": { "type": "string", "format": "date-time", "title": "Fecha" }
+  },
+  "required": ["regla"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

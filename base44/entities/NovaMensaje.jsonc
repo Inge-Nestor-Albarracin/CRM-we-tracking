@@ -1,0 +1,33 @@
+{
+  "name": "NovaMensaje",
+  "type": "object",
+  "properties": {
+    "usuario_email": {
+      "type": "string",
+      "title": "Usuario",
+      "description": "Email del usuario dueño de la conversación"
+    },
+    "rol": {
+      "type": "string",
+      "title": "Rol",
+      "enum": ["user", "assistant"],
+      "default": "user"
+    },
+    "contenido": {
+      "type": "string",
+      "title": "Contenido del mensaje"
+    },
+    "fecha": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha"
+    }
+  },
+  "required": ["rol", "contenido"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

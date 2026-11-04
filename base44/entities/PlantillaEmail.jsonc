@@ -1,0 +1,47 @@
+{
+  "name": "PlantillaEmail",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "title": "Nombre de la plantilla"
+    },
+    "asunto": {
+      "type": "string",
+      "title": "Asunto del email",
+      "description": "Soporta variables como {{nombre}}, {{empresa}}, {{sector}}"
+    },
+    "cuerpo_html": {
+      "type": "string",
+      "title": "Cuerpo HTML"
+    },
+    "cuerpo_html_url": {
+      "type": "string",
+      "title": "URL del cuerpo HTML"
+    },
+    "variables": {
+      "type": "array",
+      "title": "Variables usadas",
+      "items": { "type": "string" },
+      "description": "Lista de variables que usa esta plantilla (ej: nombre, empresa, sector)"
+    },
+    "categoria": {
+      "type": "string",
+      "title": "Categoria",
+      "enum": ["Prospeccion", "Follow-up", "Propuesta", "Informativo"],
+      "default": "Prospeccion"
+    },
+    "activo": {
+      "type": "boolean",
+      "title": "Activo",
+      "default": true
+    }
+  },
+  "required": ["nombre", "asunto"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

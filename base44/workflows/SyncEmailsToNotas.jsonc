@@ -1,0 +1,41 @@
+{
+  "name": "Sincronizar correos a notas",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "sync_emails_to_notas",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "procesar_correos": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "syncEmailToNota",
+            "args": {
+              "data": "${ .trigger.data }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Procesar correos nuevos",
+            "description": "Crea notas vinculadas a contactos"
+          }
+        }
+      }
+    ]
+  },
+  "description": "Cuando llega un correo nuevo a Gmail (webhook mailbox), lo convierte en una Nota vinculada al Contacto que coincida con el remitente.",
+  "trigger": {
+    "condition": "${ .trigger.data.has_new_messages == true }",
+    "config": {
+      "trigger_type": "connector",
+      "events": [
+        "mailbox"
+      ],
+      "integration_type": "gmail",
+      "resource_id": null
+    }
+  }
+}

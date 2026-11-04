@@ -1,0 +1,61 @@
+{
+  "name": "Documento",
+  "type": "object",
+  "properties": {
+    "cliente_id": {
+      "type": "string",
+      "description": "Legacy: ID del cliente (entidad Cliente antigua). No usar en documentos nuevos."
+    },
+    "empresa_id": {
+      "type": "string",
+      "description": "Referencia a Empresa"
+    },
+    "contacto_id": {
+      "type": "string",
+      "description": "Referencia a Contacto"
+    },
+    "nombre": {
+      "type": "string",
+      "description": "Nombre del archivo"
+    },
+    "categoria": {
+      "type": "string",
+      "enum": [
+        "Cotizacion",
+        "Contrato",
+        "Propuesta",
+        "Factura",
+        "Presentacion",
+        "Otro"
+      ],
+      "default": "Otro",
+      "description": "Categoría del documento"
+    },
+    "descripcion": {
+      "type": "string",
+      "description": "Descripción opcional del documento"
+    },
+    "tipo_mime": {
+      "type": "string",
+      "description": "Tipo MIME del archivo (ej: image/jpeg, application/pdf)"
+    },
+    "tamanio_bytes": {
+      "type": "number",
+      "description": "Tamaño del archivo en bytes"
+    },
+    "contenido": {
+      "type": "string",
+      "description": "URL del archivo subido (vía UploadFile)"
+    }
+  },
+  "required": [
+    "nombre",
+    "contenido"
+  ],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

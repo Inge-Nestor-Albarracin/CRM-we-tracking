@@ -1,0 +1,39 @@
+{
+  "name": "EvaluacionChat",
+  "type": "object",
+  "properties": {
+    "cliente_id": { "type": "string", "title": "Teléfono del lead" },
+    "contacto_nombre": { "type": "string", "title": "Nombre" },
+    "fecha": { "type": "string", "format": "date-time", "title": "Fecha de evaluación" },
+    "score_global": { "type": "number", "title": "Puntaje global (0-100)" },
+    "score_calificacion": { "type": "number", "title": "Calificación" },
+    "score_humanizacion": { "type": "number", "title": "Humanización" },
+    "score_rapidez": { "type": "number", "title": "Rapidez" },
+    "score_cierre": { "type": "number", "title": "Cierre" },
+    "veredicto": { "type": "string", "title": "Veredicto" },
+    "fortalezas": { "type": "array", "items": { "type": "string" }, "title": "Fortalezas" },
+    "errores": { "type": "array", "items": { "type": "string" }, "title": "Errores" },
+    "lecciones": { "type": "array", "items": { "type": "string" }, "title": "Lecciones" },
+    "anotaciones": {
+      "type": "array",
+      "title": "Comentarios anclados por mensaje",
+      "items": {
+        "type": "object",
+        "properties": {
+          "msg": { "type": "number" },
+          "tipo": { "type": "string" },
+          "comentario": { "type": "string" }
+        }
+      }
+    },
+    "transcripcion": { "type": "string", "title": "Transcripción (mensajes numerados)" },
+    "num_mensajes": { "type": "number", "title": "N.º de mensajes" }
+  },
+  "required": ["cliente_id"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}

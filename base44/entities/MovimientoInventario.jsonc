@@ -1,0 +1,48 @@
+{
+  "name": "MovimientoInventario",
+  "type": "object",
+  "properties": {
+    "producto_id": {
+      "type": "string",
+      "title": "Producto",
+      "description": "Referencia a Producto (movimientos nuevos)"
+    },
+    "valvula_id": {
+      "type": "string",
+      "title": "Válvula (legacy)",
+      "description": "Legacy AquaROI: referencia a Valvula. No usar en movimientos nuevos."
+    },
+    "tipo": {
+      "type": "string",
+      "title": "Tipo",
+      "enum": ["entrada", "salida", "ajuste"],
+      "description": "Valores en minúscula por compatibilidad con datos existentes"
+    },
+    "cantidad": {
+      "type": "number",
+      "title": "Cantidad",
+      "description": "En ajustes admite negativos"
+    },
+    "motivo": {
+      "type": "string",
+      "title": "Motivo"
+    },
+    "empresa_id": {
+      "type": "string",
+      "title": "Empresa",
+      "description": "Referencia a Empresa (para salidas a cliente)"
+    },
+    "cliente_id": {
+      "type": "string",
+      "title": "Cliente (legacy)",
+      "description": "Legacy AquaROI. No usar en movimientos nuevos."
+    }
+  },
+  "required": ["tipo", "cantidad"],
+  "rls": {
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] },
+    "delete": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "user" } }] }
+  }
+}
