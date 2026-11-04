@@ -41,6 +41,28 @@ fs.mkdirSync(dirSalida, { recursive: true });
 
 const b44 = createClient({ serverUrl: SERVER_URL, appId: APP_ID, token: TOKEN, requiresAuth: false });
 
+// Diagnóstico del token (solo datos públicos del JWT, nunca la firma) y comprobación previa,
+// para no lanzar 40 consultas si el token no sirve.
+try {
+  const payload = JSON.parse(Buffer.from(TOKEN.split('.')[1] || '', 'base64url').toString('utf8'));
+  const vence = payload.exp ? new Date(payload.exp * 1000).toISOString().slice(0, 10) : '?';
+  console.log(`Token de: ${payload.sub || '?'} · audiencia: ${payload.aud || '?'} · vence: ${vence}`);
+  if (payload.aud === 'platform') {
+    console.warn('⚠ Este token es de la plataforma Base44 (editor/base44.com), no de la app.');
+    console.warn('  Cópialo desde https://crm.wetracking.co (F12 → Application → Local Storage → base44_access_token).');
+  }
+} catch { console.warn('⚠ El valor de B44_TOKEN no parece un token JWT válido (¿lo copiaste completo?).'); }
+
+try {
+  const yo = await b44.auth.me();
+  console.log(`Sesión válida: ${yo?.email} (rol: ${yo?.role})\n`);
+} catch (e) {
+  console.error(`\nEl token no tiene acceso a la app (HTTP ${e?.status || e?.response?.status || '?'}). No se respaldó nada.`);
+  console.error('Usa el token de https://crm.wetracking.co con una cuenta que pueda entrar al CRM.');
+  fs.rmSync(dirSalida, { recursive: true, force: true });
+  process.exit(1);
+}
+
 async function listarTodo(nombre) {
   const ent = b44.entities[nombre];
   const todos = [];
