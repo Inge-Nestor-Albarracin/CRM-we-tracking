@@ -20,12 +20,23 @@ Rama: `fase-0-seguridad`. Referencias (SEG-xx, FE-xx) según `AUDITORIA_WTAPP.md
 
 ## Paso 1 — Respaldo de datos (antes de nada)
 
-En PowerShell, desde la carpeta `wtapp`:
+Desde la carpeta `wtapp`. El token se obtiene en crm.wetracking.co: F12 → Application → Local Storage → `base44_access_token`.
 
-```powershell
-$env:B44_TOKEN = "<token>"   # F12 en crm.wetracking.co → Application → Local Storage → base44_access_token
+En **cmd** (Símbolo del sistema), sin comillas:
+
+```bat
+set B44_TOKEN=<token>
 node scripts/backup-entidades.mjs
 ```
+
+En **PowerShell**:
+
+```powershell
+$env:B44_TOKEN = "<token>"
+node scripts/backup-entidades.mjs
+```
+
+Es un token personal: no lo pegues en chats ni en archivos. Al terminar, cierra la consola y cierra sesión en el CRM.
 
 Debe terminar sin `✘`. El resultado queda en `backup/<fecha>/` (está en `.gitignore`: no se sube).
 

@@ -1,6 +1,6 @@
 // Respaldo completo de todas las entidades de la app Base44 a archivos JSON locales.
 //
-// Uso (desde la carpeta wtapp, en PowerShell):
+// Uso (desde la carpeta wtapp). En cmd: set B44_TOKEN=<token>   En PowerShell:
 //   $env:B44_TOKEN = "<token de sesión de un admin>"
 //   node scripts/backup-entidades.mjs
 //
