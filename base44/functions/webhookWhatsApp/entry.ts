@@ -28,7 +28,8 @@ Deno.serve(async (req) => {
     const mode = url.searchParams.get('hub.mode');
     const token = url.searchParams.get('hub.verify_token');
     const challenge = url.searchParams.get('hub.challenge');
-    if (mode === 'subscribe' && token === (Deno.env.get('WHATSAPP_VERIFY_TOKEN') || 'wetracking2026')) {
+    const verifyToken = Deno.env.get('WHATSAPP_VERIFY_TOKEN') || '';
+    if (mode === 'subscribe' && verifyToken && token === verifyToken) {
       return new Response(challenge, { status: 200 });
     }
     return new Response('Forbidden', { status: 403 });
@@ -1290,7 +1291,7 @@ async function crearReunionCalendario(datos, acc, correo, BASE_URL, hoyISO) {
   try {
     const r = await fetch(`${BASE_URL}/api/functions/emmaCrearReunion`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-emma-token': Deno.env.get('CRON_TOKEN') || 'wtsofia2026' },
+      headers: { 'Content-Type': 'application/json', 'x-emma-token': Deno.env.get('CRON_TOKEN') || '' },
       body: JSON.stringify({
         nombre_cliente: nombreCliente,
         correo_cliente: correo || datos.email || '',

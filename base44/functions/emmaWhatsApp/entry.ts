@@ -19,16 +19,31 @@ async function fetchRetry(url, opts, intentos = 3, backoff = 400) {
   return ultima; // null si todo falló por red/timeout
 }
 
+// Compara la cabecera X-Hub-Signature-256 ("sha256=<hex>") con el HMAC del cuerpo crudo.
+async function firmaMetaValida(raw: string, cabecera: string, secreto: string): Promise<boolean> {
+  const recibida = cabecera.replace(/^sha256=/i, '').trim().toLowerCase();
+  if (!/^[0-9a-f]{64}$/.test(recibida)) return false;
+  const enc = new TextEncoder();
+  const clave = await crypto.subtle.importKey('raw', enc.encode(secreto), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const mac = new Uint8Array(await crypto.subtle.sign('HMAC', clave, enc.encode(raw)));
+  const esperada = Array.from(mac, (b) => b.toString(16).padStart(2, '0')).join('');
+  // Comparación en tiempo constante.
+  let dif = 0;
+  for (let i = 0; i < 64; i++) dif |= esperada.charCodeAt(i) ^ recibida.charCodeAt(i);
+  return dif === 0;
+}
+
 Deno.serve(async (req) => {
   const url = new URL(req.url);
 
-  if (url.searchParams.get('_probe') === 'version') return new Response('v2026-08-25.emmaWhatsApp.diagnostico', { status: 200 });
+  if (url.searchParams.get('_probe') === 'version') return new Response('v2026-11-04.emmaWhatsApp.fase0', { status: 200 });
 
   if (req.method === 'GET') {
     const mode = url.searchParams.get('hub.mode');
     const token = url.searchParams.get('hub.verify_token');
     const challenge = url.searchParams.get('hub.challenge');
-    if (mode === 'subscribe' && token === (Deno.env.get('WHATSAPP_VERIFY_TOKEN') || 'wetracking2026')) {
+    const verifyToken = Deno.env.get('WHATSAPP_VERIFY_TOKEN') || '';
+    if (mode === 'subscribe' && verifyToken && token === verifyToken) {
       return new Response(challenge, { status: 200 });
     }
     return new Response('Forbidden', { status: 403 });
@@ -36,8 +51,20 @@ Deno.serve(async (req) => {
 
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 
+  // SEG-05: verificar que el POST viene de Meta (firma HMAC-SHA256 con el App Secret).
+  const rawBody = await req.text();
+  const appSecret = Deno.env.get('META_APP_SECRET') || '';
+  if (!appSecret) {
+    console.error('[emmaWhatsApp] META_APP_SECRET no configurado: se rechaza el webhook');
+    return new Response('META_APP_SECRET no configurado', { status: 500 });
+  }
+  if (!(await firmaMetaValida(rawBody, req.headers.get('x-hub-signature-256') || '', appSecret))) {
+    console.warn('[emmaWhatsApp] firma de Meta inválida');
+    return new Response('Forbidden', { status: 403 });
+  }
+
   let body;
-  try { body = await req.json(); } catch { return new Response('Bad Request', { status: 400 }); }
+  try { body = JSON.parse(rawBody); } catch { return new Response('Bad Request', { status: 400 }); }
 
   const value     = body?.entry?.[0]?.changes?.[0]?.value;
   const waMessage = value?.messages?.[0];
@@ -88,7 +115,9 @@ Deno.serve(async (req) => {
     traza.push(`EXCEPCION: ${e?.message || e}`);
     console.error('Agent error:', e?.message || e);
   }
-  if (req.headers.get('x-emma-debug') === '1') {
+  // SEG-11: la traza de diagnóstico solo se devuelve con x-cron-token válido.
+  const _cron = Deno.env.get('CRON_TOKEN') || '';
+  if (req.headers.get('x-emma-debug') === '1' && _cron && req.headers.get('x-cron-token') === _cron) {
     return new Response(JSON.stringify({ traza, errorFatal }, null, 2), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
   return new Response('OK', { status: 200 });
@@ -1322,7 +1351,7 @@ async function crearReunionCalendario(datos, acc, correo, BASE_URL, hoyISO) {
   try {
     const r = await fetch(`${BASE_URL}/api/functions/emmaCrearReunion`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-emma-token': Deno.env.get('CRON_TOKEN') || 'wtsofia2026' },
+      headers: { 'Content-Type': 'application/json', 'x-emma-token': Deno.env.get('CRON_TOKEN') || '' },
       body: JSON.stringify({
         nombre_cliente: nombreCliente,
         correo_cliente: correo || datos.email || '',

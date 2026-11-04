@@ -4,16 +4,24 @@
 // También se puede invocar manualmente (POST). Delega el envío a la función sendEmail.
 // Env: BASE44_API_KEY.
 
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+
 const BASE_URL = 'https://wtapp.base44.app';
 
 function jsonRes(obj: unknown, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
 }
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
   const apiKey = Deno.env.get('BASE44_API_KEY') || '';
   if (!apiKey) return jsonRes({ message: 'BASE44_API_KEY no configurada' }, 500);
-  const hdrs = { 'api_key': apiKey, 'Content-Type': 'application/json' };
+  // SEG-03: solo cron (x-cron-token o ?token=) o un usuario con sesión.
+  const cron = Deno.env.get('CRON_TOKEN') || '';
+  const tokenRecibido = req.headers.get('x-cron-token') || new URL(req.url).searchParams.get('token') || '';
+  let autorizado = !!cron && tokenRecibido === cron;
+  if (!autorizado) { try { autorizado = !!(await createClientFromRequest(req).auth.me())?.email; } catch { /* */ } }
+  if (!autorizado) return jsonRes({ message: 'No autorizado' }, 401);
+  const hdrs: Record<string, string> = { 'api_key': apiKey, 'Content-Type': 'application/json', 'x-cron-token': cron };
 
   const ahora = new Date();
 

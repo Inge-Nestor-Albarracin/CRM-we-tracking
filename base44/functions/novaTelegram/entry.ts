@@ -895,7 +895,12 @@ async function ejecutarAccion(
 Deno.serve(async (req) => {
   // La sonda va PRIMERO: si queda después del check de POST, un GET muere arriba
   // devolviendo "OK" y no hay forma de verificar si el deploy propagó.
-  if (new URL(req.url).searchParams.get('_probe') === 'version') return new Response('v2026-08-25.novaTelegram.ttltest', { status: 200 });
+  if (new URL(req.url).searchParams.get('_probe') === 'version') return new Response('v2026-11-04.novaTelegram.fase0', { status: 200 });
+  // SEG-11: las sondas de diagnóstico requieren la cabecera x-cron-token (gastan API y exponen el CRM).
+  const _probe = new URL(req.url).searchParams.get('_probe');
+  if (_probe && (!Deno.env.get('CRON_TOKEN') || req.headers.get('x-cron-token') !== Deno.env.get('CRON_TOKEN'))) {
+    return new Response('Unauthorized', { status: 401 });
+  }
   // Auditoría del contexto (no llama al modelo, solo mide cuánto pesa cada parte).
   // PRUEBA EMPIRICA del TTL: ¿leer el cache reinicia el reloj (ventana corrediza)
   // o el vencimiento es fijo desde la escritura? Manda un system FIJO y grande con
@@ -942,8 +947,11 @@ Deno.serve(async (req) => {
   const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY') || '';
   if (!token || !apiKey || !anthropicKey) return new Response('Config faltante', { status: 200 });
 
+  // SEG-01: el secret del webhook es OBLIGATORIO (prueba que el update viene de Telegram).
+  // Se registra con: https://api.telegram.org/bot<TOKEN>/setWebhook?url=<URL de novaTelegram>&secret_token=<SECRET>
   const secret = Deno.env.get('TELEGRAM_COPILOTO_SECRET') || '';
-  if (secret && req.headers.get('X-Telegram-Bot-Api-Secret-Token') !== secret) return new Response('Forbidden', { status: 403 });
+  if (!secret) return new Response('TELEGRAM_COPILOTO_SECRET no configurado', { status: 500 });
+  if (req.headers.get('X-Telegram-Bot-Api-Secret-Token') !== secret) return new Response('Forbidden', { status: 403 });
 
   let update: any;
   try { update = await req.json(); } catch { return new Response('OK', { status: 200 }); }
@@ -952,6 +960,30 @@ Deno.serve(async (req) => {
   const chatId = message?.chat?.id;
   const chatType: string = message?.chat?.type || '';
   if (!message || !chatId) return new Response('OK', { status: 200 });
+
+  // SEG-01: lista blanca. Solo el equipo puede usar NOVA.
+  //   NOVA_TG_IDS   = IDs numéricos de usuario de Telegram permitidos, separados por coma.
+  //   NOVA_TG_CHATS = IDs de los grupos donde NOVA puede leer/responder (opcional; sin él, solo chats privados).
+  const _lista = (v: string | undefined) => (v || '').split(',').map((x) => x.trim()).filter(Boolean);
+  const idsPermitidos = _lista(Deno.env.get('NOVA_TG_IDS'));
+  const chatsPermitidos = _lista(Deno.env.get('NOVA_TG_CHATS'));
+  const remitenteId = String(message.from?.id || '');
+  const esChatPrivado = chatType === 'private';
+  if (!esChatPrivado && !chatsPermitidos.includes(String(chatId))) {
+    console.warn(`[novaTelegram] grupo no autorizado chat_id=${chatId}`);
+    return new Response('OK', { status: 200 });
+  }
+  if (!idsPermitidos.includes(remitenteId)) {
+    console.warn(`[novaTelegram] usuario no autorizado tg_id=${remitenteId} chat_id=${chatId}`);
+    if (esChatPrivado && !message.edit_date) {
+      // Le decimos su ID para que un admin lo agregue a NOVA_TG_IDS. No revela nada del CRM.
+      try {
+        await fetch(TG(token, 'sendMessage'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: `No estás autorizado para usar este asistente. Tu ID de Telegram es ${remitenteId}. Pídele a un administrador que lo agregue.` }) });
+      } catch { /* */ }
+    }
+    return new Response('OK', { status: 200 });
+  }
 
   // Ignora mensajes viejos (backlog en cola o reintentos): solo procesa lo reciente.
   const edadSeg = Math.floor(Date.now() / 1000) - (Number(message.date) || 0);

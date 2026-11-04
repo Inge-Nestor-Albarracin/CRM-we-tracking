@@ -4,7 +4,7 @@
 // globos_json, enviar_en, nota_id }. Este cron lee SOLO esa cola (pocos registros
 // pequeños) -> corridas de <2s en vez de escanear 500 Notas grandes (que tardaba 20-40s).
 // GET/POST  /api/apps/{appId}/functions/enviarPendientes?token=...
-// Env: BASE44_API_KEY, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_API_TOKEN, CRON_TOKEN (opcional).
+// Env: BASE44_API_KEY, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_API_TOKEN, CRON_TOKEN (obligatorio).
 
 const BASE_URL = 'https://wtapp.base44.app';
 const MAX_POR_CORRIDA = 12;
@@ -15,12 +15,14 @@ Deno.serve(async (req) => {
   const base44Key = Deno.env.get('BASE44_API_KEY') || '';
   const waPhoneId = Deno.env.get('WHATSAPP_PHONE_NUMBER_ID') || '';
   const waToken   = Deno.env.get('WHATSAPP_API_TOKEN') || '';
-  const cronToken = Deno.env.get('CRON_TOKEN') || 'wtsofia2026';
+  const cronToken = Deno.env.get('CRON_TOKEN') || '';
+  if (!cronToken) return new Response(JSON.stringify({ error: 'CRON_TOKEN no configurado' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
 
   const url = new URL(req.url);
   let body: any = {};
   try { body = await req.json(); } catch { /* GET sin body */ }
-  const token = url.searchParams.get('token') || body.token || '';
+  // Preferir la cabecera x-cron-token (no queda en logs). ?token= se mantiene por compatibilidad con cron-job.org.
+  const token = req.headers.get('x-cron-token') || url.searchParams.get('token') || body.token || '';
   if (token !== cronToken) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
 
   // AUTENTICACION (2026-08-20). La app es privada: el header api_key devuelve 403

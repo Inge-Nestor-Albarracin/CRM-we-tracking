@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ReunionNota, Empresa, Tarea, base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -140,32 +140,9 @@ export default function Reuniones() {
 
   const empresasById = useMemo(() => Object.fromEntries(empresas.map(e => [e.id, e])), [empresas]);
 
-  // Limpieza automática (una sola vez): elimina las reuniones EXCLUIDAS que ya existan.
-  // Las de Drive/Gmail se borran en suave (descartada) para que la sync no las recree;
-  // las manuales se borran de verdad. Solo un Admin puede borrar.
-  const limpiezaExcluidasRef = useRef(false);
-  useEffect(() => {
-    if (!isAdmin || limpiezaExcluidasRef.current) return;
-    const porExcluir = reuniones.filter(r => !r.descartada && fueraReunion(r));
-    if (porExcluir.length === 0) return;
-    limpiezaExcluidasRef.current = true;
-    (async () => {
-      let n = 0;
-      for (const r of porExcluir) {
-        try {
-          const tareas = await Tarea.filter({ reunion_nota_id: r.id }).catch(() => []);
-          for (const t of tareas) { try { await Tarea.delete(t.id); } catch { /* ignore */ } }
-          if (r.doc_id || r.gmail_message_id) await ReunionNota.update(r.id, { descartada: true });
-          else await ReunionNota.delete(r.id);
-          n++;
-        } catch (e) { console.error('No se pudo excluir', r.id, e); }
-      }
-      const ids = new Set(porExcluir.map(x => x.id));
-      qc.setQueryData(['reuniones'], (old = []) => old.filter(x => !ids.has(x.id)));
-      qc.invalidateQueries({ queryKey: ['tareas-global'] });
-      if (n > 0) toast({ title: `${n} reunión(es) eliminadas`, description: 'Excluidas (Comité Comercial, AAXA, trabajo remoto, Gastii) y las de junio 2026 hacia atrás.' });
-    })();
-  }, [reuniones, isAdmin]);
+  // FE-04: aquí había un borrado AUTOMÁTICO (sin confirmación) de las reuniones excluidas
+  // cada vez que un admin abría la página. Se quitó: la vista ya las oculta con fueraReunion(),
+  // así que no hace falta borrarlas para que no aparezcan.
 
   async function procesarNota(reunionId) {
     setProcesandoId(reunionId);
@@ -559,7 +536,7 @@ export default function Reuniones() {
                   {reprocesando ? `Reprocesando ${progreso.hechas}/${progreso.total}...` : `Reprocesar todas (${visibles.length})`}
                 </DropdownMenuItem>
               )}
-              {duplicadas.length > 0 && (
+              {isAdmin && duplicadas.length > 0 && (
                 <DropdownMenuItem onClick={deduplicarReuniones} disabled={deduplicando}>
                   <Copy className="w-4 h-4 mr-2" /> Deduplicar {duplicadas.length} repetida(s)
                 </DropdownMenuItem>

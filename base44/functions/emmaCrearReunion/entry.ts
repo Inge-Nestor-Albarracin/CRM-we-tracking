@@ -59,7 +59,8 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return jsonRes({ error: 'Solo POST' }, 405);
 
   const token = req.headers.get('x-emma-token') || '';
-  const esperado = Deno.env.get('CRON_TOKEN') || 'wtsofia2026';
+  const esperado = Deno.env.get('CRON_TOKEN') || '';
+  if (!esperado) return jsonRes({ error: 'CRON_TOKEN no configurado' }, 500);
   if (token !== esperado) return jsonRes({ error: 'Unauthorized' }, 401);
 
   let body: Record<string, string>;

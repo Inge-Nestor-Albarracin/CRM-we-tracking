@@ -371,6 +371,13 @@ async function ejecutarAccion(
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return jsonRes({ message: 'Solo POST' }, 405);
 
+  // SEG-02: solo usuarios con sesión en el CRM (antes aceptaba llamadas anónimas).
+  {
+    let u: any = null;
+    try { u = await createClientFromRequest(req).auth.me(); } catch { /* sin sesión */ }
+    if (!u?.email) return jsonRes({ message: 'No autenticado' }, 401);
+  }
+
   const apiKey = Deno.env.get('BASE44_API_KEY') || '';
   const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY') || '';
   if (!apiKey) return jsonRes({ message: 'BASE44_API_KEY no configurada' }, 500);
@@ -427,7 +434,7 @@ Deno.serve(async (req) => {
     const _eqEmails = _memActivos.length ? _memActivos.map((m: any) => String(m.email || '').toLowerCase()).filter(Boolean) : EQUIPO_EMAILS;
     // Quién escribe (usuario logueado del CRM) -> memoria por persona + "mi correo".
     let webUser: any = null;
-    try { webUser = await b44.auth.me(); } catch { /* anónimo */ }
+    try { webUser = await b44.auth.me(); } catch { /* ya validado arriba */ }
     const miEmail = String(webUser?.email || '').toLowerCase();
     const miNombre = webUser?.full_name || webUser?.email || 'el usuario';
     const memKey = miEmail;

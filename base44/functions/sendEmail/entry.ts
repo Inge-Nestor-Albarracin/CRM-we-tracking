@@ -100,6 +100,15 @@ function cumpleSegmento(contacto: Record<string, unknown>, filtros: Criterio[], 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return err400('Solo POST');
 
+  // SEG-03: requiere sesión del CRM, o la cabecera x-cron-token (llamadas internas / cron).
+  {
+    const cron = Deno.env.get('CRON_TOKEN') || '';
+    const esCron = !!cron && req.headers.get('x-cron-token') === cron;
+    let u: any = null;
+    if (!esCron) { try { u = await createClientFromRequest(req).auth.me(); } catch { /* sin sesión */ } }
+    if (!esCron && !u?.email) return new Response(JSON.stringify({ error: 'No autenticado' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+  }
+
   const base44 = createClientFromRequest(req);
   const appId = Deno.env.get('BASE44_APP_ID') || '';
   const apiKey = Deno.env.get('BASE44_API_KEY') || '';

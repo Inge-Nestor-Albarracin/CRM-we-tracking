@@ -6,7 +6,7 @@
 //   GET/POST  /api/apps/{appId}/functions/procesarReunionesDiarias?token=...
 //   Params:   token (requerido) · wait=1 (procesa sincrónico y devuelve el resumen; sin él
 //             responde al instante y trabaja en segundo plano, ideal para el scheduler).
-//   Env:      BASE44_API_KEY, CRON_TOKEN (opcional, default 'wtsofia2026').
+//   Env:      BASE44_API_KEY, CRON_TOKEN (obligatorio, sin valor por defecto).
 //
 // NOTA: solo cubre la conexión de APP (por ahora ms@grouptso.com). Teams/OneDrive son
 // por-usuario (getCurrentAppUserConnection) y NO entran en la automatización hasta que
@@ -43,12 +43,14 @@ function claveTitulo(titulo: string): string {
 
 Deno.serve(async (req) => {
   const apiKey = Deno.env.get('BASE44_API_KEY') || '';
-  const cronToken = Deno.env.get('CRON_TOKEN') || 'wtsofia2026';
+  const cronToken = Deno.env.get('CRON_TOKEN') || '';
+  if (!cronToken) return jsonRes({ error: 'CRON_TOKEN no configurado' }, 500);
 
   const url = new URL(req.url);
   let body: any = {};
   try { body = await req.json(); } catch { /* GET sin body */ }
-  const token = url.searchParams.get('token') || body.token || '';
+  // Preferir la cabecera x-cron-token (no queda en logs). ?token= se mantiene por compatibilidad con cron-job.org.
+  const token = req.headers.get('x-cron-token') || url.searchParams.get('token') || body.token || '';
   if (token !== cronToken) return jsonRes({ error: 'Unauthorized' }, 401);
   if (!apiKey) return jsonRes({ error: 'BASE44_API_KEY no configurada' }, 500);
   const wait = url.searchParams.get('wait') === '1' || body.wait === true;

@@ -19,6 +19,15 @@ function b64url(str: string): string {
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return jsonRes({ error: 'Solo POST' }, 405);
+
+  // SEG-03: requiere sesión del CRM, o la cabecera x-cron-token (llamadas internas / cron).
+  {
+    const cron = Deno.env.get('CRON_TOKEN') || '';
+    const esCron = !!cron && req.headers.get('x-cron-token') === cron;
+    let u: any = null;
+    if (!esCron) { try { u = await createClientFromRequest(req).auth.me(); } catch { /* sin sesión */ } }
+    if (!esCron && !u?.email) return jsonRes({ error: 'No autenticado' }, 401);
+  }
   let body: any = {};
   try { body = await req.json(); } catch { /* */ }
   const to = String(body.to || '').trim();
@@ -27,6 +36,10 @@ Deno.serve(async (req) => {
   const threadId = body.threadId ? String(body.threadId) : '';
   const inReplyTo = body.inReplyTo ? String(body.inReplyTo) : '';
   if (!to || !cuerpo) return jsonRes({ error: 'Faltan destinatario o cuerpo' }, 400);
+  // SEG-03: evita inyección de cabeceras MIME (p.ej. un salto de línea seguido de "Bcc: ...").
+  if (/[\r\n]/.test(to + inReplyTo + threadId) ||!/^[^@\s,;]+@[^@\s,;]+\.[^@\s,;]+$/.test(to)) {
+    return jsonRes({ error: 'Destinatario inválido' }, 400);
+  }
 
   try {
     const b44 = createClientFromRequest(req);

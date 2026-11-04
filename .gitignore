@@ -32,3 +32,6 @@ dist-ssr
 .vercel
 base44/.app.jsonc
 /connectors/
+
+# Respaldos de datos (contienen datos de clientes, nunca subir)
+backup/
