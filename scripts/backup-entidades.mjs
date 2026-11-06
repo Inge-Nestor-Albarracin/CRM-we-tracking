@@ -33,6 +33,9 @@ const dirEntidades = path.join(raiz, 'base44', 'entities');
 const entidades = fs.readdirSync(dirEntidades)
   .filter((f) => f.endsWith('.jsonc'))
   .map((f) => f.replace(/\.jsonc$/, ''))
+  // User lo administra la plataforma: la API solo deja listarlo a colaboradores del editor
+  // ("Only collaborators can view the list of users"). Los usuarios se ven en el panel de Base44.
+  .filter((n) => n !== 'User')
   .sort();
 
 const sello = new Date().toISOString().slice(0, 16).replace(/:/g, '-');
