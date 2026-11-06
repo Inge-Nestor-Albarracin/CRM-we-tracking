@@ -16,6 +16,7 @@ Rama: `fase-0-seguridad`. Referencias (SEG-xx, FE-xx) según `AUDITORIA_WTAPP.md
 | SEG-03 | `sendEmail`, `gmailEnviar`, `enviarCampanasProgramadas` | Exigen sesión o `x-cron-token`. `gmailEnviar` valida el destinatario (bloquea la inyección de cabeceras) | `CRON_TOKEN` |
 | SEG-05 | `emmaWhatsApp` | Verifica la firma `X-Hub-Signature-256` de Meta. La traza `x-emma-debug` exige `x-cron-token` | `META_APP_SECRET` |
 | SEG-09 | `checkCredenciales`, `seedConocimiento`, `seedInventario`, `seedPlantillas`, `novaWebhook` | **Eliminadas** del repo (el código queda en el historial de git) | Borrarlas también en la plataforma |
+| SEG-07 | `src/hooks/useUserRole.js`, `src/pages/Configuracion.jsx` | El rol Admin del CRM sale del rol de Base44 (`admin`/`user`), ya no de un correo fijo ni de `PerfilUsuario.rol`. **Antes de desplegar:** dar rol `admin` en Base44 → Usuarios de la app a quien deba seguir siendo admin en el CRM (hoy por `PerfilUsuario` lo son karen@grouptso.com y wetdavpernettqu@gmail.com) | Revisar roles en el panel |
 | FE-04/05 | `src/pages/crm/Reuniones.jsx` | Se quita el borrado automático al entrar un admin. "Deduplicar" queda solo para admin | Desplegar el sitio |
 
 ## Paso 1 — Respaldo de datos (antes de nada)
