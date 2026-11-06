@@ -166,4 +166,6 @@ Rama `marca-frontend`. Publicado el checkpoint `6aee2be7e85a37b41e40871b` (commi
 
 Después de publicar, `verificar-fase0.mjs` sigue en 12/12.
 
+**Ajuste publicado el 2026-11-06 20:12 UTC** (checkpoint `6aee3407b3f38a12adf0d19f`): PDF más sobrio (sin círculos ni píldoras, cabe en una hoja) y barra superior del CRM del color del fondo, con el logo en el menú lateral. Seguridad: 12/12.
+
 **Para volver atrás:** historial de versiones del editor → `Fase 0 - seguridad (sin publicar)` → Publicar. Ese checkpoint conserva la seguridad sin el diseño nuevo.
