@@ -55,7 +55,7 @@ export default function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(v => !v)}
-        className="relative p-2 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+        className="relative p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Tareas pendientes"
       >
         <Bell className="w-5 h-5" />

@@ -177,7 +177,7 @@ export default function CopilotoWidget() {
       <button
         onClick={() => setAbierto(o => !o)}
         title="Nova · Copiloto IA"
-        className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${abierto ? 'bg-wt-cian text-wt-marino' : 'hover:bg-white/10 text-white'}`}
+        className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${abierto ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-foreground'}`}
       >
         <Sparkles className="w-[18px] h-[18px]" />
       </button>

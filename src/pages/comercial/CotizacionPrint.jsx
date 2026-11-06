@@ -13,7 +13,6 @@ const INTRO = 'De acuerdo con su solicitud y atendiendo sus requerimientos en WE
 const MARINO = '#0B194F';
 const AZUL = '#1184E6';
 const TURQUESA = '#00A5D7';
-const CIAN = '#00FFD7';
 const TEXTO = '#1d2440';
 const SUAVE = '#5b6478';
 const LINEA = '#e3e8f0';
@@ -40,9 +39,8 @@ const sinPunto = (t) => String(t || '').replace(/\.\s*$/, '');
 
 function TituloSeccion({ n, children }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '26px 0 10px', breakAfter: 'avoid' }}>
-      <span style={{ minWidth: 26, height: 26, borderRadius: 999, background: `linear-gradient(135deg, ${CIAN}, ${TURQUESA})`, color: MARINO, fontWeight: 800, fontSize: 13, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{n}</span>
-      <p style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, color: MARINO, letterSpacing: '.04em', textTransform: 'uppercase' }}>{children}</p>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '18px 0 8px', breakAfter: 'avoid' }}>
+      <p style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, color: MARINO, letterSpacing: '.04em', textTransform: 'uppercase' }}>{n}. {children}</p>
       <span style={{ flex: 1, height: 1, background: LINEA }} />
     </div>
   );
@@ -50,7 +48,7 @@ function TituloSeccion({ n, children }) {
 
 function FilaTotal({ label, valor, color, negrita }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, padding: '6px 14px', fontSize: 12.5, color: color || TEXTO, fontWeight: negrita ? 700 : 400 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, padding: '4px 14px', fontSize: 12.5, color: color || TEXTO, fontWeight: negrita ? 700 : 400 }}>
       <span>{label}</span><span style={{ fontVariantNumeric: 'tabular-nums' }}>{valor}</span>
     </div>
   );
@@ -95,11 +93,11 @@ export default function CotizacionPrint() {
   const firmaCargo = perfil?.cargo || WETRACKING.remitente_cargo || '';
   const firmaUrl = perfil?.firma_url || WETRACKING.firma_url || '';
 
-  const th = { padding: '9px 10px', fontSize: 10.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#fff', background: MARINO, textAlign: 'right', whiteSpace: 'nowrap' };
-  const td = { padding: '9px 10px', fontSize: 12, verticalAlign: 'top', borderBottom: `1px solid ${LINEA}`, textAlign: 'right', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' };
+  const th = { padding: '8px 10px', fontSize: 10.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#fff', background: MARINO, textAlign: 'right', whiteSpace: 'nowrap' };
+  const td = { padding: '7px 10px', fontSize: 12, verticalAlign: 'top', borderBottom: `1px solid ${LINEA}`, textAlign: 'right', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' };
   const parr = { fontSize: 12.5, color: TEXTO, margin: '0 0 8px', lineHeight: 1.55, textAlign: 'justify' };
   const etiqueta = { margin: '0 0 3px', fontSize: 9.5, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: TURQUESA };
-  const tarjeta = { flex: 1, background: FONDO, borderRadius: 12, padding: '12px 16px', fontSize: 12.5, color: TEXTO };
+  const tarjeta = { flex: 1, background: FONDO, borderRadius: 12, padding: '10px 16px', fontSize: 12.5, color: TEXTO };
 
   return (
     <div style={{ fontFamily: 'var(--font-sans)', color: TEXTO, maxWidth: 816, margin: '0 auto', background: '#fff', position: 'relative', overflow: 'hidden' }}>
@@ -107,7 +105,7 @@ export default function CotizacionPrint() {
         @media print { .no-print { display: none !important; } html, body { margin: 0; background: #fff !important; } }
         * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         /* La 1.ª página va a sangre (la franja de color toca el borde); las siguientes llevan margen. */
-        @page { size: letter; margin: 14mm 0 14mm; }
+        @page { size: letter; margin: 12mm 0 10mm; }
         @page :first { margin-top: 0; }
         .cot-fila { break-inside: avoid; }
       `}</style>
@@ -117,14 +115,12 @@ export default function CotizacionPrint() {
         <button onClick={() => navigate('/comercial/cotizaciones')} style={{ background: '#fff', color: MARINO, border: `1px solid ${LINEA}`, borderRadius: 999, padding: '10px 20px', fontSize: 14, cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}>Volver</button>
       </div>
 
-      {/* Franja superior con el degradé de marca y las "píldoras" diagonales del manual */}
-      <div style={{ height: 6, background: `linear-gradient(90deg, ${CIAN}, ${TURQUESA} 45%, ${AZUL})` }} />
-      <span aria-hidden="true" style={{ position: 'absolute', top: -30, right: -46, width: 150, height: 30, borderRadius: 999, background: CIAN, opacity: 0.85, transform: 'rotate(-45deg)' }} />
-      <span aria-hidden="true" style={{ position: 'absolute', top: 18, right: -14, width: 90, height: 30, borderRadius: 999, background: AZUL, opacity: 0.9, transform: 'rotate(-45deg)' }} />
+      {/* Franja superior fina en azul marino (formato sobrio, sin elementos decorativos) */}
+      <div style={{ height: 5, background: MARINO }} />
 
-      <div style={{ padding: '30px 48px 40px' }}>
+      <div style={{ padding: '22px 48px 12px' }}>
         {/* Encabezado */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, marginBottom: 26, paddingRight: 64 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, marginBottom: 18, }}>
           <div style={{ color: MARINO }}>
             <WeLogo className="h-9 w-auto" title="WeTracking" />
             <p style={{ margin: '2px 0 0 2px', fontSize: 10, letterSpacing: '.22em', color: SUAVE }}>Soluciones Integrales</p>
@@ -137,7 +133,7 @@ export default function CotizacionPrint() {
         </div>
 
         {/* Cliente y datos de la cotización */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 22 }}>
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
           <div style={{ ...tarjeta, flex: 1.4 }}>
             <p style={etiqueta}>Cliente</p>
             <p style={{ margin: '0 0 2px', fontWeight: 700, fontSize: 14, color: MARINO }}>{empresa?.nombre || '—'}</p>
@@ -181,7 +177,7 @@ export default function CotizacionPrint() {
                 {r.hayDescuento && (
                   <td style={{ ...td, textAlign: 'center' }}>
                     {l.descuento_pct > 0
-                      ? <span style={{ display: 'inline-block', background: '#dcfaf4', color: AHORRO, borderRadius: 999, padding: '1px 8px', fontWeight: 700, fontSize: 11 }}>−{pct(l.descuento_pct)}</span>
+                      ? <span style={{ color: AHORRO, fontWeight: 700 }}>−{pct(l.descuento_pct)}</span>
                       : <span style={{ color: '#b3bac8' }}>—</span>}
                   </td>
                 )}
@@ -198,8 +194,7 @@ export default function CotizacionPrint() {
         <div className="cot-fila" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 20 }}>
           <div style={{ flex: 1 }}>
             {r.hayDescuento && (
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center', border: `1.5px dashed ${TURQUESA}`, background: '#effcfa', borderRadius: 12, padding: '12px 14px', maxWidth: 330 }}>
-                <span style={{ width: 34, height: 34, borderRadius: 999, background: `linear-gradient(135deg, ${CIAN}, ${TURQUESA})`, color: MARINO, fontWeight: 800, fontSize: 13, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>%</span>
+              <div style={{ borderLeft: `3px solid ${AHORRO}`, background: FONDO, borderRadius: 6, padding: '10px 14px', maxWidth: 330 }}>
                 <div style={{ fontSize: 12, lineHeight: 1.45 }}>
                   <p style={{ margin: 0, fontWeight: 700, color: AHORRO }}>Descuento aplicado{pctUnico ? ` del ${pct(pctUnico)}` : ''}</p>
                   <p style={{ margin: 0, color: TEXTO }}>Ahorro de <strong>{M(r.descuento)}</strong> sobre el valor de lista{pctUnico ? '' : ` (${pct(r.descuentoPct)} en total)`}.</p>
@@ -213,7 +208,7 @@ export default function CotizacionPrint() {
             {r.hayDescuento && <FilaTotal label="Subtotal con descuento" valor={M(r.base)} negrita />}
             {r.iva > 0 && <FilaTotal label={`IVA ${r.ivaPct}%`} valor={M(r.iva)} />}
             {r.envio > 0 && <FilaTotal label="Envío" valor={M(r.envio)} />}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, padding: '11px 14px', background: MARINO, color: '#fff' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '9px 14px', background: MARINO, color: '#fff' }}>
               <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em' }}>TOTAL{cot.moneda ? ` ${cot.moneda}` : ''}</span>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{M(r.total)}</span>
             </div>
@@ -233,21 +228,22 @@ export default function CotizacionPrint() {
         {/* Notas extra opcionales de la cotización */}
         {cot.notas && <p style={{ ...parr, marginTop: 12, padding: '10px 14px', background: FONDO, borderRadius: 10, whiteSpace: 'pre-wrap' }}>{cot.notas}</p>}
 
-        {/* Firma del remitente (por usuario) */}
-        <div className="cot-fila" style={{ marginTop: 40, fontSize: 12.5 }}>
-          <p style={{ margin: '0 0 6px' }}>Cordialmente,</p>
-          {firmaUrl && <img src={firmaUrl} alt="Firma" style={{ height: 60, width: 'auto', objectFit: 'contain', display: 'block', margin: '4px 0' }} />}
-          <div style={{ marginTop: firmaUrl ? 0 : 40, borderLeft: `3px solid ${CIAN}`, paddingLeft: 10 }}>
-            <p style={{ margin: 0, fontWeight: 700, textTransform: 'uppercase', color: MARINO }}>{firmaNombre}</p>
-            {firmaCargo && <p style={{ margin: '1px 0 0', color: SUAVE }}>{firmaCargo}</p>}
-            <p style={{ margin: '1px 0 0', fontWeight: 700, color: AZUL }}>WE TRACKING</p>
+        {/* Firma del remitente (por usuario) y, a su derecha, los datos de la empresa. Van juntos
+            para que el pie no termine solo en una hoja aparte. */}
+        <div className="cot-fila" style={{ marginTop: 22, fontSize: 12.5, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 24 }}>
+          <div>
+            <p style={{ margin: '0 0 6px' }}>Cordialmente,</p>
+            {firmaUrl && <img src={firmaUrl} alt="Firma" style={{ height: 60, width: 'auto', objectFit: 'contain', display: 'block', margin: '4px 0' }} />}
+            <div style={{ marginTop: firmaUrl ? 0 : 26, borderLeft: `3px solid ${MARINO}`, paddingLeft: 10 }}>
+              <p style={{ margin: 0, fontWeight: 700, textTransform: 'uppercase', color: MARINO }}>{firmaNombre}</p>
+              {firmaCargo && <p style={{ margin: '1px 0 0', color: SUAVE }}>{firmaCargo}</p>}
+              <p style={{ margin: '1px 0 0', fontWeight: 700, color: AZUL }}>WE TRACKING</p>
+            </div>
           </div>
-        </div>
-
-        {/* Pie */}
-        <div className="cot-fila" style={{ marginTop: 34, paddingTop: 12, borderTop: `1px solid ${LINEA}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10.5, color: SUAVE }}>
-          <span>WeTracking · Soluciones Integrales</span>
-          <span style={{ color: AZUL, fontWeight: 600 }}>{WETRACKING.web}</span>
+          <div style={{ textAlign: 'right', fontSize: 10.5, color: SUAVE, lineHeight: 1.5 }}>
+            <p style={{ margin: 0 }}>WeTracking · Soluciones Integrales</p>
+            <p style={{ margin: 0, color: AZUL, fontWeight: 600 }}>{WETRACKING.web}</p>
+          </div>
         </div>
       </div>
     </div>

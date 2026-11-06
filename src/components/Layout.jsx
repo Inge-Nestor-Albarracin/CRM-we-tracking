@@ -292,76 +292,70 @@ export default function Layout() {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      {/* z-30: por encima de la página y por DEBAJO de todo lo que flota encima de ella
-          (overlay del menú móvil z-40, diálogos z-50, visores z-60, toasts z-100). Estuvo en
-          z-[9999] y por eso la barra tapaba la parte de arriba de cualquier ventana modal,
-          como la de Nueva cotización. El 9999 venía de los popovers de FullCalendar, que se
-          bajan en index.css. */}
-      <header className="fixed top-0 left-0 right-0 z-30 flex items-center h-14 px-4 bg-wt-marino text-white shrink-0">
-        {/* Píldoras diagonales de marca (decorativas). Van en su propio contenedor recortado para no
-            recortar el desplegable de notificaciones. */}
-        <span className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <span className="wt-pildora hidden sm:block w-44 h-7 bg-wt-azul/30 -right-8 -top-1" />
-          <span className="wt-pildora hidden sm:block w-16 h-7 bg-wt-cian/20 right-36 top-7" />
-        </span>
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="md:hidden p-1.5 rounded-lg hover:bg-white/10 text-white mr-2"
-          aria-label="Abrir menú"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-
-        <Link to="/" className="flex items-center mr-4 text-white">
-          <WeLogo className="h-[26px] w-auto flex-shrink-0" />
+    <div className="flex h-screen bg-background">
+      {/* Menú lateral de escritorio: ocupa todo el alto y lleva el logo arriba. */}
+      <aside className="hidden md:flex w-60 flex-shrink-0 bg-gradient-to-b from-wt-marino to-[hsl(230_80%_11%)] flex-col">
+        <Link to="/" className="flex items-center h-14 px-5 text-white flex-shrink-0">
+          <WeLogo className="h-[26px] w-auto" />
         </Link>
+        {navContent}
+      </aside>
 
-        <div className="flex-1 pointer-events-none" />
-
-        <div className="relative flex items-center gap-1.5">
-          <CopilotoWidget />
-          <NotificationBell />
-        </div>
-      </header>
-
-      {/* Spacer: el header es fixed (fuera del flujo), esto rellena su altura */}
-      <div className="h-14 shrink-0" aria-hidden="true" />
-
-      <div className="flex flex-1 overflow-hidden">
-        <div className="hidden md:flex w-60 bg-gradient-to-b from-wt-marino to-[hsl(230_80%_11%)] flex-col">
-          {navContent}
-        </div>
-
-        {mobileOpen && (
-          <div
-            className="fixed inset-0 bg-wt-marino/40 backdrop-blur-[2px] z-40 md:hidden"
-            onClick={() => setMobileOpen(false)}
-          />
-        )}
-
+      {mobileOpen && (
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-wt-marino to-[hsl(230_80%_11%)] flex flex-col transform transition-transform duration-300 ease-out md:hidden ${
-            mobileOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
-        >
-          <div className="flex items-center justify-between px-4 h-14 border-b border-white/10">
-            <div className="flex items-center text-white">
-              <WeLogo className="h-6 w-auto flex-shrink-0" />
-            </div>
-            <button
-              onClick={() => setMobileOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-white/10 text-white/70"
-              aria-label="Cerrar menú"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          className="fixed inset-0 bg-wt-marino/40 backdrop-blur-[2px] z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-wt-marino to-[hsl(230_80%_11%)] flex flex-col transform transition-transform duration-300 ease-out md:hidden ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between px-4 h-14 border-b border-white/10">
+          <div className="flex items-center text-white">
+            <WeLogo className="h-6 w-auto flex-shrink-0" />
           </div>
-          {navContent}
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="p-1.5 rounded-lg hover:bg-white/10 text-white/70"
+            aria-label="Cerrar menú"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
+        {navContent}
+      </div>
+
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Barra superior del mismo color del fondo: se funde con la página (sin franja).
+            z-30: por encima de la página y por DEBAJO de todo lo que flota encima de ella
+            (overlay del menú móvil z-40, diálogos z-50, visores z-60, toasts z-100). */}
+        <header className="relative z-30 flex items-center h-14 px-4 md:px-6 bg-background shrink-0">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="md:hidden p-1.5 rounded-lg hover:bg-muted text-foreground mr-2"
+            aria-label="Abrir menú"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          {/* En celular no se ve el menú lateral: el logo va aquí. */}
+          <Link to="/" className="md:hidden flex items-center mr-4 text-wt-marino">
+            <WeLogo className="h-[24px] w-auto flex-shrink-0" />
+          </Link>
+
+          <div className="flex-1 pointer-events-none" />
+
+          <div className="relative flex items-center gap-1.5">
+            <CopilotoWidget />
+            <NotificationBell />
+          </div>
+        </header>
 
         <div className="flex-1 overflow-auto pb-14 md:pb-0">
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 pt-1 pb-4 md:pb-8">
             <Outlet />
           </div>
         </div>
