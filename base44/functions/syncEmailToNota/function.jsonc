@@ -1,0 +1,4 @@
+{
+  "name": "syncEmailToNota",
+  "entry": "entry.ts"
+}

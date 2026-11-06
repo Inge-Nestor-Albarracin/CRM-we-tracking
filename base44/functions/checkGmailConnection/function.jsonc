@@ -1,0 +1,4 @@
+{
+  "name": "checkGmailConnection",
+  "entry": "entry.ts"
+}

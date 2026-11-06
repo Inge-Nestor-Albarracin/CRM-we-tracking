@@ -73,16 +73,17 @@ npx base44 whoami
 
 Avísame cuando esté. La sesión queda guardada en el PC y desde ahí puedo usar el CLI.
 
-## Paso 4 — Traer el código actual del editor e integrarlo (YO)
+## Paso 4 — Traer el código actual del editor e integrarlo (YO) ✅ (2026-11-06)
 
-El editor tiene cambios hechos con su IA ("nombre editable", "logo propio") que no están en nuestra rama. Con el CLI:
+- **Checkpoint en el editor:** "Antes de Fase 0 (respaldo de seguridad)" (`6aee0ecc49d6642c399cb109`). Si algo sale mal, se restaura desde el historial de versiones del editor.
+- **Código del editor == nuestra base `e8b1499`.** Ningún archivo de `src/` ni de `base44/` difiere. El "nombre editable" y el "logo propio" (`CampoEditable.jsx`, `LogoEmpresaEditable.jsx`) **ya estaban en el código**; lo que falta es **publicarlos**.
+- Se copiaron a la rama los `function.jsonc` del editor (50 funciones desplegadas). `classifyLead` y `sendWhatsAppMessage` **no están desplegadas**, lo que confirma FE-01.
+- ⚠️ `base44 eject` **creó una app copia** (`crm-we-tracking-copy-421d0d53.base44.app`, id `6aee0ef58f382dbe421d0d53`) sin datos ni secretos. **TÚ:** bórrala desde su panel (app.base44.com → esa app → Configuración → Eliminar). No volver a usar `eject`.
+- **Secretos configurados hoy (solo nombres):** `ANTHROPIC_API_KEY`, `BASE44_API_KEY`, `ELEVENLABS_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_COPILOTO_TOKEN`, `WHATSAPP_API_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` y `WHATSAPP_VERIFY_TOKEN`.
+  - **No existe `CRON_TOKEN`**: hoy todo funciona con el valor por defecto `wtsofia2026`, que está publicado en GitHub.
+  - **No existe `TELEGRAM_COPILOTO_SECRET`**: el webhook de NOVA no tiene ninguna protección.
 
-1. **Punto de restauración** en el historial del editor: `base44 sandbox checkpoint --name "Antes de Fase 0"`. Permite volver atrás desde el builder si algo sale mal.
-2. **Bajar el código del editor** a una carpeta aparte (`eject` / `sandbox read`).
-3. **Comparar** con el código base (`e8b1499`) e **integrar** esos cambios en la rama sin perder ninguno.
-4. **Listar los nombres** de los secretos configurados (`secrets list`). Solo los nombres, nunca los valores. Así sabemos qué falta del Paso 5.
-
-Después te pido otro `git push`.
+> **Ojo al publicar:** el editor tiene cambios acumulados desde la última publicación (el editor dice que es del 7 de octubre). Al pulsar Publicar salen **esos cambios + la Fase 0**. Antes de publicar, revisa la **Vista previa** del editor (Paso 7).
 
 ## Paso 5 — Configurar los secretos (TÚ)
 
@@ -101,11 +102,11 @@ Generar un valor aleatorio en PowerShell (para `CRON_TOKEN` y `TELEGRAM_COPILOTO
 | a | `META_APP_SECRET` | Meta for Developers → tu app → Configuración → Básica → **Clave secreta de la app** | No. Se puede poner ya |
 | b | `NOVA_TG_IDS` | IDs de Telegram del equipo, separados por coma. Cada uno le escribe a **@userinfobot** y te pasa su "Id" | No |
 | c | `NOVA_TG_CHATS` | (Opcional) ID del grupo del equipo donde NOVA responde. Sin esta variable, NOVA solo funciona en chats privados | No |
-| d | `WHATSAPP_VERIFY_TOKEN` | El "Token de verificación" que está en Meta → WhatsApp → Configuración → Webhook. Si nadie lo cambió, es `wetracking2026` | No (solo se usa al verificar el webhook) |
+| d | ~~`WHATSAPP_VERIFY_TOKEN`~~ | **Ya existe.** No hay que hacer nada | — |
 | e | `CRON_TOKEN` | **Nuevo**, aleatorio | **Sí.** Los crons que hoy usan `?token=wtsofia2026` empiezan a fallar. **Inmediatamente después**, en cron-job.org, cambia en cada cron `?token=wtsofia2026` por `?token=<nuevo>` |
 | f | `TELEGRAM_COPILOTO_SECRET` | **Nuevo**, aleatorio (solo letras y números) | **Sí.** NOVA deja de responder hasta registrar el secret en Telegram. **Inmediatamente después**, abre en el navegador:<br>`https://api.telegram.org/bot<TOKEN_DEL_BOT_NOVA>/setWebhook?url=<URL_ACTUAL>&secret_token=<SECRET>`<br>La `<URL_ACTUAL>` sale de `https://api.telegram.org/bot<TOKEN>/getWebhookInfo`. Debe responder `"ok":true` |
 
-Avísame cuando estén las seis (o cinco, sin la opcional). **No me pases los valores.**
+Avísame cuando estén a, b, e y f (c es opcional). **No me pases los valores.** Puedo comprobar que existen con `secrets list`, que solo muestra los nombres.
 
 ## Paso 6 — Subir los cambios al editor (YO)
 
@@ -116,7 +117,8 @@ Avísame cuando estén las seis (o cinco, sin la opcional). **No me pases los va
 
 ## Paso 7 — Publicar (TÚ)
 
-Botón **Publicar** en la barra superior del editor. Hasta este momento, producción sigue con el código viejo.
+1. En el editor, abre **Vista previa** y revisa lo básico: login, Dashboard, una empresa, una cotización y Reuniones.
+2. Botón **Publicar** en la barra superior del editor. Hasta este momento, producción sigue con el código viejo.
 
 ## Paso 8 — Verificar (YO + TÚ)
 

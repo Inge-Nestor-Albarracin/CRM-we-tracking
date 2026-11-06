@@ -1,0 +1,4 @@
+{
+  "name": "checkDriveConnection",
+  "entry": "entry.ts"
+}

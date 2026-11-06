@@ -1,0 +1,4 @@
+{
+  "name": "checkOneDriveConnection",
+  "entry": "entry.ts"
+}

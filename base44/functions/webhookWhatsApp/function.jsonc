@@ -1,0 +1,4 @@
+{
+  "name": "webhookWhatsApp",
+  "entry": "entry.ts"
+}
