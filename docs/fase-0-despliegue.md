@@ -154,3 +154,16 @@ En cron-job.org, en cada cron: quitar `?token=...` de la URL y agregar la cabece
 2. **Rotar las claves de los proveedores** y reemplazarlas en Base44: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `ELEVENLABS_API_KEY`, `WHATSAPP_API_TOKEN` (System User de Meta Business) y `BASE44_API_KEY`.
 3. **Bots de Telegram:** en BotFather, `/revoke` para obtener tokens nuevos de Emma y de NOVA. Actualizar `TELEGRAM_BOT_TOKEN` y `TELEGRAM_COPILOTO_TOKEN`, y repetir el `setWebhook` del Paso 5f para cada bot.
 4. **Quitarle el acceso** en Meta Business, cron-job.org y el GitHub viejo, y desconectar ese repo del editor si sigue vinculado.
+
+---
+
+## Después de la Fase 0: diseño de marca y PDF de cotización ✅ (publicado 2026-11-06 19:37 UTC)
+
+Rama `marca-frontend`. Publicado el checkpoint `6aee2be7e85a37b41e40871b` (commit del editor `5477684`), que incluye:
+
+- **Diseño de marca** (checkpoint `6aee28a82496a1ae02f76975`): paleta y tipografías del Manual de marca, logo vectorial, cabecera y menú en azul marino, banner del Dashboard, splash de carga.
+- **PDF de cotización**: formato de marca y descuentos visibles (columna Dcto., Subtotal de lista / Descuento / Subtotal con descuento, recuadro de ahorro). El correo de la cotización también muestra el descuento.
+
+Después de publicar, `verificar-fase0.mjs` sigue en 12/12.
+
+**Para volver atrás:** historial de versiones del editor → `Fase 0 - seguridad (sin publicar)` → Publicar. Ese checkpoint conserva la seguridad sin el diseño nuevo.
