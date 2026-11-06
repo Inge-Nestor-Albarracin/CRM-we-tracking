@@ -177,7 +177,7 @@ export default function CopilotoWidget() {
       <button
         onClick={() => setAbierto(o => !o)}
         title="Nova · Copiloto IA"
-        className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${abierto ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-foreground'}`}
+        className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${abierto ? 'bg-wt-cian text-wt-marino' : 'hover:bg-white/10 text-white'}`}
       >
         <Sparkles className="w-[18px] h-[18px]" />
       </button>
@@ -188,11 +188,11 @@ export default function CopilotoWidget() {
           <div className="fixed inset-0 z-40" onClick={() => setAbierto(false)} />
 
           {/* Panel flotante tipo chatbot */}
-          <div className="fixed z-50 right-3 top-14 bottom-3 w-[calc(100vw-1.5rem)] sm:w-[400px] sm:bottom-4 sm:h-[620px] sm:max-h-[calc(100vh-4.5rem)] flex flex-col bg-card border border-border/60 rounded-2xl shadow-2xl overflow-hidden">
+          <div className="fixed z-50 right-3 top-14 bottom-3 w-[calc(100vw-1.5rem)] sm:w-[400px] sm:bottom-4 sm:h-[620px] sm:max-h-[calc(100vh-4.5rem)] flex flex-col bg-card text-foreground border border-border/60 rounded-2xl shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/60 bg-card">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-4 h-4 text-primary" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-wt-cian to-wt-azul flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-wt-marino" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground leading-tight">Nova</p>

@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from '@/components/Layout.jsx';
 import { useUserRole } from '@/hooks/useUserRole';
+import WeLogo from '@/components/brand/WeLogo';
 
 // Páginas base
 import Dashboard from '@/pages/Dashboard.jsx';
@@ -72,8 +73,14 @@ const AuthenticatedApp = () => {
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      // Splash de marca (como en el "Diseño App v03"): fondo marino → azul con el logo en negativo.
+      <div className="wt-fondo-marca fixed inset-0 flex flex-col items-center justify-center gap-6 overflow-hidden">
+        <span className="wt-pildora w-72 h-20 bg-wt-azul/40 -right-16 top-16" aria-hidden="true" />
+        <span className="wt-pildora w-56 h-20 bg-white/[0.06] -left-16 bottom-20" aria-hidden="true" />
+        <WeLogo className="relative h-10 w-auto text-white" />
+        <div className="relative h-1 w-28 overflow-hidden rounded-full bg-white/15" role="progressbar" aria-label="Cargando">
+          <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-wt-cian to-wt-azul animate-[wt-carga_1.1s_ease-in-out_infinite]" />
+        </div>
       </div>
     );
   }

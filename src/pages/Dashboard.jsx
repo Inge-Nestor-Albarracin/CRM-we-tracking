@@ -17,6 +17,7 @@ import {
 import { format, addMonths, startOfMonth, endOfMonth, subDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { estadoEfectivo } from '@/lib/wetracking';
+import { useAuth } from '@/lib/AuthContext';
 
 const Contacto = base44.entities.Contacto;
 const Tarea = base44.entities.Tarea;
@@ -32,16 +33,16 @@ import { ETAPAS_ABIERTAS_OP as ETAPAS_ABIERTAS } from '@/components/crm/Oportuni
 // Sequenciales de una sola serie usan un hue del tema; los pares llevan leyenda.
 const C = {
   ganado: 'hsl(145 63% 42%)',    // verde — dinero ganado
-  pipeline: 'hsl(211 100% 50%)', // azul — valor en pipeline
-  leads: 'hsl(199 89% 48%)',     // cyan — leads
-  rotacion: 'hsl(262 83% 58%)',  // púrpura — rotación
+  pipeline: 'hsl(208 86% 48%)',  // azul de marca #1184E6 — valor en pipeline
+  leads: 'hsl(194 100% 42%)',    // turquesa de marca #00A5D7 — leads
+  rotacion: 'hsl(228 60% 42%)',  // marino de marca (aclarado) — rotación
   entrada: 'hsl(145 63% 42%)',   // verde — entradas
   salida: 'hsl(25 95% 53%)',     // naranja — salidas (evita verde/rojo por daltonismo)
 };
 // Colores de ESTADO de cotización (reservados, siempre con etiqueta del estado).
 const ESTADO_COT = {
   Aceptada: 'hsl(142 71% 40%)',
-  Enviada: 'hsl(211 100% 50%)',
+  Enviada: 'hsl(208 86% 48%)',
   Vencida: 'hsl(38 92% 45%)',
   Rechazada: 'hsl(0 72% 51%)',
   Borrador: 'hsl(215 16% 62%)',
@@ -70,12 +71,18 @@ const AXIS_TICK = { fontSize: 11, fill: 'hsl(var(--muted-foreground))' };
 
 function KpiCard({ icon: Icon, label, value, sub, to, tono }) {
   const card = (
-    <div className="rounded-xl border border-border/60 bg-card p-5 hover:border-border transition-colors h-full">
+    <div className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-5 h-full transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-12px_hsl(228_60%_20%/0.25)]">
+      {/* Filo superior con el degradé de marca al pasar el mouse */}
+      <span className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-wt-cian to-wt-azul opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
       <div className="flex items-start justify-between gap-3">
-        <p className="text-[13px] text-muted-foreground">{label}</p>
-        {Icon && <Icon className={`w-4 h-4 flex-shrink-0 ${tono || 'text-muted-foreground/40'}`} strokeWidth={1.75} />}
+        <p className="text-[13px] font-semibold text-muted-foreground">{label}</p>
+        {Icon && (
+          <span className="w-8 h-8 rounded-xl bg-wt-azul/10 flex items-center justify-center flex-shrink-0">
+            <Icon className={`w-4 h-4 ${tono || 'text-wt-azul'}`} strokeWidth={2} />
+          </span>
+        )}
       </div>
-      <p className="text-[26px] font-semibold text-foreground mt-2 leading-none tracking-tight">{value}</p>
+      <p className="font-display text-[28px] font-medium text-foreground mt-1 leading-none tracking-tight">{value}</p>
       {sub && <p className="text-[12px] text-muted-foreground mt-2">{sub}</p>}
     </div>
   );
@@ -106,6 +113,25 @@ function formatCOP(n) {
   if (a >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
   if (a >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
   return `$${Math.round(n)}`;
+}
+
+// Banner de bienvenida con la estética de la app de marca: fondo marino → azul y píldoras diagonales.
+function BannerBienvenida() {
+  const { user } = useAuth();
+  const nombre = (user?.full_name || '').trim().split(/\s+/)[0];
+  const hoy = format(new Date(), "EEEE d 'de' MMMM", { locale: es });
+  return (
+    <div className="wt-fondo-marca relative overflow-hidden rounded-3xl px-6 py-7 md:px-8 md:py-8">
+      <span className="wt-pildora w-56 h-14 bg-wt-cian/25 sm:bg-wt-cian/80 -right-16 sm:-right-10 top-4" aria-hidden="true" />
+      <span className="wt-pildora w-40 h-14 bg-wt-azul/40 sm:bg-wt-azul/70 right-10 sm:right-24 -bottom-6" aria-hidden="true" />
+      <span className="wt-pildora hidden sm:block w-24 h-14 bg-white/10 right-52 top-0" aria-hidden="true" />
+      <div className="relative sm:max-w-[65%]">
+        <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-wt-cian first-letter:uppercase">{hoy}</p>
+        <h1 className="text-[28px] md:text-[34px] font-medium leading-tight mt-1">¡Hola{nombre ? `, ${nombre}` : ''}!</h1>
+        <p className="text-white/75 text-[15px] mt-1">Resumen financiero, comercial y de inventario de WeTracking</p>
+      </div>
+    </div>
+  );
 }
 
 export default function Dashboard() {
@@ -249,15 +275,12 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[28px] font-bold text-foreground tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground text-[15px] mt-0.5">Resumen financiero, comercial y de inventario de WeTracking</p>
-      </div>
+      <BannerBienvenida />
 
       {/* KPIs financieros */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KpiCard icon={DollarSign} tono="text-blue-500/70" label="Pipeline abierto" value={formatCOP(stats.valorPipeline)} sub={`${stats.abiertas} oportunidades`} to="/crm/pipeline" />
-        <KpiCard icon={Target} tono="text-emerald-500/70" label="Ganado este año" value={formatCOP(stats.ganadoAnio)} sub="Cerrado ganado (COP)" to="/crm/pipeline" />
+        <KpiCard icon={DollarSign} label="Pipeline abierto" value={formatCOP(stats.valorPipeline)} sub={`${stats.abiertas} oportunidades`} to="/crm/pipeline" />
+        <KpiCard icon={Target} tono="text-emerald-600" label="Ganado este año" value={formatCOP(stats.ganadoAnio)} sub="Cerrado ganado (COP)" to="/crm/pipeline" />
         <KpiCard icon={Receipt} label="Ticket promedio" value={formatCOP(stats.ticketPromedio)} sub="Por negocio ganado" to="/crm/pipeline" />
         <KpiCard icon={Percent} label="Win rate" value={`${stats.winRate}%`} sub="Ganadas vs cerradas" to="/crm/pipeline" />
       </div>
@@ -265,7 +288,7 @@ export default function Dashboard() {
       {/* KPIs inventario + operación */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard icon={Boxes} label="Valor de inventario" value={formatCOP(stats.valorInventario)} sub={`${stats.unidadesTotales} uds en stock`} to="/comercial/inventario" />
-        <KpiCard icon={RefreshCw} tono="text-violet-500/70" label="Rotación (90 días)" value={`${stats.rotacion90.toFixed(1)}×`} sub={stats.bajoStock > 0 ? `${stats.bajoStock} bajo mínimo` : 'Inventario al día'} to="/comercial/inventario" />
+        <KpiCard icon={RefreshCw} label="Rotación (90 días)" value={`${stats.rotacion90.toFixed(1)}×`} sub={stats.bajoStock > 0 ? `${stats.bajoStock} bajo mínimo` : 'Inventario al día'} to="/comercial/inventario" />
         <KpiCard icon={FileText} label="Cotizaciones del mes" value={`${stats.cotsAceptadas}/${stats.cotsEnviadas}`} sub={stats.cotsEnviadas > 0 ? `${stats.tasaAceptacion}% aceptación` : 'Sin enviadas'} to="/comercial/cotizaciones" />
         <KpiCard icon={Clock} label="Tareas pendientes" value={stats.tareasPendientes.length} sub={stats.tareasVencidas > 0 ? `${stats.tareasVencidas} vencidas` : 'Al día'} to="/crm/tareas" />
       </div>

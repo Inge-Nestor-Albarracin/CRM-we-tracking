@@ -6,6 +6,7 @@ module.exports = {
   	extend: {
   		fontFamily: {
   			sans: ['var(--font-sans)'],
+  			display: ['var(--font-display)'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
@@ -13,6 +14,13 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+  			// Colores de marca WeTracking (ver index.css)
+  			wt: {
+  				cian: 'hsl(var(--wt-cian) / <alpha-value>)',
+  				azul: 'hsl(var(--wt-azul) / <alpha-value>)',
+  				turquesa: 'hsl(var(--wt-turquesa) / <alpha-value>)',
+  				marino: 'hsl(var(--wt-marino) / <alpha-value>)',
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

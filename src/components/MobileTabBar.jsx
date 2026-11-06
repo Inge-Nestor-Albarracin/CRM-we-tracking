@@ -27,12 +27,13 @@ export default function MobileTabBar() {
             <Link
               key={tab.path}
               to={tab.path}
-              className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-                active ? 'text-primary' : 'text-muted-foreground'
+              className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
+                active ? 'text-wt-azul' : 'text-muted-foreground'
               }`}
             >
+              {active && <span className="absolute -top-1 h-1 w-6 rounded-full bg-gradient-to-r from-wt-cian to-wt-azul" aria-hidden="true" />}
               <Icon className="w-[22px] h-[22px]" strokeWidth={active ? 2.4 : 2} />
-              <span className="text-[10px] font-medium">{tab.label}</span>
+              <span className={`text-[10px] ${active ? 'font-bold' : 'font-medium'}`}>{tab.label}</span>
             </Link>
           );
         })}

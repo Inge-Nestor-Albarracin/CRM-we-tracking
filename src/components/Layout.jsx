@@ -15,6 +15,14 @@ import CopilotoWidget from '@/components/CopilotoWidget';
 import MobileTabBar from '@/components/MobileTabBar';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAutoSyncNotasPersonales } from '@/hooks/useAutoSyncNotasPersonales';
+import WeLogo from '@/components/brand/WeLogo';
+
+// Menú lateral sobre fondo azul marino de marca. El ítem activo lleva la barra cian del manual.
+const navTop = (activo) => `relative flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[15px] transition-all duration-200 ${
+  activo
+    ? 'bg-white/[0.12] text-white font-semibold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:rounded-full before:bg-wt-cian'
+    : 'text-white/80 hover:text-white hover:bg-white/[0.07]'
+}`;
 
 const NAV_SECTIONS = [
   {
@@ -156,11 +164,7 @@ export default function Layout() {
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         <Link
           to="/"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[15px] transition-all duration-200 ${
-            location.pathname === '/'
-              ? 'bg-muted text-foreground font-semibold'
-              : 'text-foreground hover:bg-muted'
-          }`}
+          className={navTop(location.pathname === '/')}
         >
           <LayoutGrid className="w-[19px] h-[19px] flex-shrink-0" />
           <span>Dashboard</span>
@@ -168,16 +172,12 @@ export default function Layout() {
 
         <Link
           to="/inbox"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[15px] transition-all duration-200 ${
-            location.pathname === '/inbox'
-              ? 'bg-muted text-foreground font-semibold'
-              : 'text-foreground hover:bg-muted'
-          }`}
+          className={navTop(location.pathname === '/inbox')}
         >
           <MessageSquare className="w-[19px] h-[19px] flex-shrink-0" />
           <span className="flex-1">Bandeja</span>
           {totalBadge > 0 && (
-            <span className="bg-red-500 text-white text-[11px] font-semibold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center">
+            <span className="bg-wt-cian text-wt-marino text-[11px] font-bold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center">
               {totalBadge > 9 ? '9+' : totalBadge}
             </span>
           )}
@@ -185,18 +185,14 @@ export default function Layout() {
 
         <Link
           to="/copiloto"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[15px] transition-all duration-200 ${
-            location.pathname === '/copiloto'
-              ? 'bg-muted text-foreground font-semibold'
-              : 'text-foreground hover:bg-muted'
-          }`}
+          className={navTop(location.pathname === '/copiloto')}
         >
           <Sparkles className="w-[19px] h-[19px] flex-shrink-0" />
           <span>Copiloto</span>
         </Link>
 
         <div className="pt-4 pb-1.5">
-          <p className="px-3 text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Módulos</p>
+          <p className="px-3 text-[11px] font-semibold text-white/45 uppercase tracking-[0.12em]">Módulos</p>
         </div>
 
         {NAV_SECTIONS.map(section => {
@@ -215,19 +211,19 @@ export default function Layout() {
                 onClick={() => toggleSection(section.key)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[15px] transition-all duration-200 ${
                   sectionActive
-                    ? 'text-foreground font-medium bg-muted'
-                    : 'text-foreground hover:bg-muted'
+                    ? 'text-white font-semibold'
+                    : 'text-white/80 hover:text-white hover:bg-white/[0.07]'
                 }`}
               >
                 <SectionIcon className="w-[19px] h-[19px] flex-shrink-0" />
                 <span className="flex-1 text-left">{section.label}</span>
                 <ChevronRight
-                  className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
+                  className={`w-4 h-4 text-white/50 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
                 />
               </button>
 
               {isOpen && (
-                <div className="ml-4 mt-0.5 mb-1 space-y-0.5 border-l border-border/60 pl-2">
+                <div className="ml-4 mt-0.5 mb-1 space-y-0.5 border-l border-white/15 pl-2">
                   {visibleItems.map(item => {
                     const active = isItemActive(item.path);
                     return (
@@ -236,10 +232,11 @@ export default function Layout() {
                         to={item.path}
                         className={`flex items-center gap-2.5 px-3 py-2 rounded-[8px] text-[14px] transition-all duration-200 ${
                           active
-                            ? 'bg-muted text-foreground font-medium'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                            ? 'bg-white/[0.12] text-white font-semibold'
+                            : 'text-white/65 hover:text-white hover:bg-white/[0.07]'
                         }`}
                       >
+                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${active ? 'bg-wt-cian' : 'bg-white/25'}`} />
                         {item.label}
                       </Link>
                     );
@@ -251,45 +248,41 @@ export default function Layout() {
         })}
 
         <div className="pt-4 pb-1.5">
-          <p className="px-3 text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Sistema</p>
+          <p className="px-3 text-[11px] font-semibold text-white/45 uppercase tracking-[0.12em]">Sistema</p>
         </div>
 
         <Link
           to="/configuracion"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[15px] transition-all duration-200 ${
-            location.pathname === '/configuracion'
-              ? 'bg-muted text-foreground font-semibold'
-              : 'text-foreground hover:bg-muted'
-          }`}
+          className={navTop(location.pathname === '/configuracion')}
         >
           <Settings className="w-[19px] h-[19px] flex-shrink-0" />
           <span>Configuración</span>
         </Link>
       </nav>
 
-      <div className="px-3 pb-4 pt-3 border-t border-border/60">
+      <div className="px-3 pb-4 pt-3 border-t border-white/10">
         {user && (
-          <Link to="/perfil" onClick={() => setMobileOpen(false)} className="block px-2 py-1.5 mb-1 rounded-[8px] hover:bg-muted/60 transition-colors" title="Mi perfil">
+          <Link to="/perfil" onClick={() => setMobileOpen(false)} className="block px-2 py-1.5 mb-1 rounded-[8px] hover:bg-white/[0.07] transition-colors" title="Mi perfil">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-wt-cian to-wt-azul flex items-center justify-center text-wt-marino font-bold text-sm flex-shrink-0">
                 {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <p className="text-[13px] font-medium text-foreground truncate">{user.full_name}</p>
-                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 border ${isAdmin ? 'border-border text-muted-foreground' : 'border-border text-muted-foreground'}`}>
+                  <p className="text-[13px] font-semibold text-white truncate">{user.full_name}</p>
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 border ${isAdmin ? 'border-wt-cian/40 text-wt-cian' : 'border-white/20 text-white/70'}`}>
                     {rol}
                   </span>
                 </div>
-                <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
+                <p className="text-[11px] text-white/55 truncate">{user.email}</p>
               </div>
-              <CircleUser className="w-4 h-4 text-muted-foreground/50 flex-shrink-0" />
+              <CircleUser className="w-4 h-4 text-white/40 flex-shrink-0" />
             </div>
           </Link>
         )}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2 px-3 py-2 text-[14px] text-red-500 hover:bg-red-500/5 rounded-[8px] transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 text-[14px] text-red-300 hover:text-red-200 hover:bg-red-500/10 rounded-[8px] transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Cerrar sesión
@@ -305,61 +298,61 @@ export default function Layout() {
           z-[9999] y por eso la barra tapaba la parte de arriba de cualquier ventana modal,
           como la de Nueva cotización. El 9999 venía de los popovers de FullCalendar, que se
           bajan en index.css. */}
-      <header className="fixed top-0 left-0 right-0 z-30 flex items-center h-12 px-4 bg-card/80 backdrop-blur-xl border-b border-border/60 shrink-0">
+      <header className="fixed top-0 left-0 right-0 z-30 flex items-center h-14 px-4 bg-wt-marino text-white shrink-0">
+        {/* Píldoras diagonales de marca (decorativas). Van en su propio contenedor recortado para no
+            recortar el desplegable de notificaciones. */}
+        <span className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          <span className="wt-pildora hidden sm:block w-44 h-7 bg-wt-azul/30 -right-8 -top-1" />
+          <span className="wt-pildora hidden sm:block w-16 h-7 bg-wt-cian/20 right-36 top-7" />
+        </span>
         <button
           onClick={() => setMobileOpen(true)}
-          className="md:hidden p-1.5 rounded-lg hover:bg-muted text-foreground mr-2"
+          className="md:hidden p-1.5 rounded-lg hover:bg-white/10 text-white mr-2"
+          aria-label="Abrir menú"
         >
           <Menu className="w-5 h-5" />
         </button>
 
-        <Link to="/" className="flex items-center gap-2.5 mr-4">
-          <img
-            src="https://media.base44.com/images/public/6a43f4eff47c0d92cfe2b575/e332deb61_Logo-WeTr-RGB_V-Original-color2.png"
-            alt="WeTracking"
-            className="h-12 w-auto rounded-[6px] flex-shrink-0 object-contain"
-          />
+        <Link to="/" className="flex items-center mr-4 text-white">
+          <WeLogo className="h-[26px] w-auto flex-shrink-0" />
         </Link>
 
         <div className="flex-1 pointer-events-none" />
 
-        <div className="flex items-center gap-1.5">
+        <div className="relative flex items-center gap-1.5">
           <CopilotoWidget />
           <NotificationBell />
         </div>
       </header>
 
       {/* Spacer: el header es fixed (fuera del flujo), esto rellena su altura */}
-      <div className="h-12 shrink-0" aria-hidden="true" />
+      <div className="h-14 shrink-0" aria-hidden="true" />
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="hidden md:flex w-60 bg-card flex-col border-r border-border/60">
+        <div className="hidden md:flex w-60 bg-gradient-to-b from-wt-marino to-[hsl(230_80%_11%)] flex-col">
           {navContent}
         </div>
 
         {mobileOpen && (
           <div
-            className="fixed inset-0 bg-black/30 z-40 md:hidden"
+            className="fixed inset-0 bg-wt-marino/40 backdrop-blur-[2px] z-40 md:hidden"
             onClick={() => setMobileOpen(false)}
           />
         )}
 
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-72 bg-card flex flex-col border-r border-border/60 transform transition-transform duration-300 ease-out md:hidden ${
+          className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-wt-marino to-[hsl(230_80%_11%)] flex flex-col transform transition-transform duration-300 ease-out md:hidden ${
             mobileOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="flex items-center justify-between px-4 h-12 border-b border-border/60">
-            <div className="flex items-center gap-2.5">
-              <img
-                src="https://media.base44.com/images/public/6a43f4eff47c0d92cfe2b575/e332deb61_Logo-WeTr-RGB_V-Original-color2.png"
-                alt="WeTracking"
-                className="h-6 w-auto rounded-[6px] flex-shrink-0 object-contain"
-              />
+          <div className="flex items-center justify-between px-4 h-14 border-b border-white/10">
+            <div className="flex items-center text-white">
+              <WeLogo className="h-6 w-auto flex-shrink-0" />
             </div>
             <button
               onClick={() => setMobileOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-white/70"
+              aria-label="Cerrar menú"
             >
               <X className="w-5 h-5" />
             </button>

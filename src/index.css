@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Abril+Fatface:wght@400&display=swap');
+/* Identidad WeTracking (Manual de marca, dic. 2020).
+   Tipografías: Nunito Sans para textos (pág. 17). Uni Neue, la de títulos, es comercial (Fontfabric)
+   y no está en Google Fonts: se usa Outfit, una geométrica muy cercana.
+   Colores (pág. 15): Cian #00FFD7 · Azul #1184E6 · Turquesa #00A5D7 · Marino #0B194F.
+   OJO: index.html tiene una Content-Security-Policy; fonts.googleapis.com / fonts.gstatic.com
+   deben seguir permitidos ahí o las fuentes no cargan. */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300..800&family=Outfit:wght@300..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,77 +12,83 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    --font-sans: 'Nunito Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Outfit', 'Nunito Sans', system-ui, sans-serif;
 
-    /* iOS Clásico — Light */
-    --background: 240 6% 97%;
-    --foreground: 222 47% 11%;
+    /* Colores de marca en HSL (para usar con /opacidad en Tailwind: bg-wt-azul/10) */
+    --wt-cian: 171 100% 50%;      /* #00FFD7 */
+    --wt-azul: 208 86% 48%;       /* #1184E6 */
+    --wt-turquesa: 194 100% 42%;  /* #00A5D7 */
+    --wt-marino: 228 76% 18%;     /* #0B194F */
+
+    --background: 225 33% 97%;
+    --foreground: 228 45% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 228 45% 14%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 211 100% 50%;
+    --popover-foreground: 228 45% 14%;
+    --primary: 228 76% 18%;            /* botones en azul marino, como la app de marca */
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 220 9% 46%;
-    --accent: 211 100% 50%;
-    --accent-foreground: 0 0% 100%;
+    --secondary: 222 40% 95%;
+    --secondary-foreground: 228 45% 14%;
+    --muted: 222 35% 95%;
+    --muted-foreground: 225 14% 44%;
+    --accent: 208 86% 95%;             /* realce suave (hover de menús y botones fantasma) */
+    --accent-foreground: 228 76% 18%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 211 100% 50%;
-    --chart-1: 211 100% 50%;
-    --chart-2: 199 89% 48%;
-    --chart-3: 145 63% 42%;
-    --chart-4: 262 83% 58%;
+    --border: 222 28% 90%;
+    --input: 222 28% 88%;
+    --ring: 208 86% 48%;
+    --chart-1: 208 86% 48%;
+    --chart-2: 194 100% 42%;
+    --chart-3: 228 60% 35%;
+    --chart-4: 168 80% 38%;
     --chart-5: 340 75% 55%;
     --radius: 0.875rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 211 100% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 6% 96%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 211 100% 50%;
+    --sidebar-background: 228 76% 18%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 171 100% 50%;
+    --sidebar-primary-foreground: 228 76% 18%;
+    --sidebar-accent: 228 55% 26%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 228 50% 26%;
+    --sidebar-ring: 171 100% 50%;
   }
 
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 96%;
-    --card: 0 0% 11%;
-    --card-foreground: 0 0% 96%;
-    --popover: 0 0% 11%;
-    --popover-foreground: 0 0% 96%;
-    --primary: 211 100% 50%;
+    --background: 229 55% 7%;
+    --foreground: 220 30% 95%;
+    --card: 228 45% 11%;
+    --card-foreground: 220 30% 95%;
+    --popover: 228 45% 11%;
+    --popover-foreground: 220 30% 95%;
+    --primary: 208 86% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 16%;
-    --secondary-foreground: 0 0% 96%;
-    --muted: 0 0% 16%;
-    --muted-foreground: 0 0% 58%;
-    --accent: 211 100% 50%;
-    --accent-foreground: 0 0% 100%;
+    --secondary: 228 35% 17%;
+    --secondary-foreground: 220 30% 95%;
+    --muted: 228 35% 17%;
+    --muted-foreground: 222 18% 66%;
+    --accent: 228 40% 20%;
+    --accent-foreground: 220 30% 95%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 211 100% 50%;
-    --chart-1: 211 100% 50%;
-    --chart-2: 199 89% 48%;
-    --chart-3: 145 63% 42%;
-    --chart-4: 262 83% 58%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 0 0% 7%;
-    --sidebar-foreground: 0 0% 96%;
-    --sidebar-primary: 211 100% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 16%;
-    --sidebar-accent-foreground: 0 0% 96%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 211 100% 50%;
+    --border: 228 32% 21%;
+    --input: 228 32% 23%;
+    --ring: 171 100% 50%;
+    --chart-1: 208 86% 58%;
+    --chart-2: 194 100% 50%;
+    --chart-3: 171 90% 45%;
+    --chart-4: 228 60% 65%;
+    --chart-5: 340 75% 60%;
+    --sidebar-background: 229 60% 9%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 171 100% 50%;
+    --sidebar-primary-foreground: 228 76% 18%;
+    --sidebar-accent: 228 45% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 228 40% 18%;
+    --sidebar-ring: 171 100% 50%;
   }
 }
 
@@ -90,7 +102,31 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.01em;
+  }
+
+  h1, h2 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+}
+
+@layer components {
+  /* Fondo de las pantallas de marca (login, splash, banner del Dashboard): degradé marino → azul. */
+  .wt-fondo-marca {
+    background:
+      radial-gradient(120% 90% at 100% 0%, hsl(var(--wt-azul) / 0.55) 0%, transparent 60%),
+      linear-gradient(160deg, hsl(228 76% 22%) 0%, hsl(var(--wt-marino)) 55%, hsl(230 80% 12%) 100%);
+    color: #fff;
+  }
+  /* Barra de carga del splash */
+  @keyframes wt-carga { 0% { transform: translateX(-110%); } 100% { transform: translateX(220%); } }
+
+  /* "Píldoras" diagonales del manual (las mismas formas de la paleta de color y el número de página). */
+  .wt-pildora {
+    position: absolute;
+    border-radius: 9999px;
+    transform: rotate(-45deg);
+    pointer-events: none;
   }
 }
 

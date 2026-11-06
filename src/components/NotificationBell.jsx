@@ -55,18 +55,19 @@ export default function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(v => !v)}
-        className="relative p-2 rounded-lg hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"
+        className="relative p-2 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+        aria-label="Tareas pendientes"
       >
         <Bell className="w-5 h-5" />
         {badgeCount > 0 && (
-          <span className="absolute top-1 right-1 w-4 h-4 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+          <span className="absolute top-1 right-1 w-4 h-4 bg-wt-cian text-wt-marino text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
             {badgeCount > 9 ? '9+' : badgeCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border/60 rounded-xl shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-card text-foreground border border-border/60 rounded-xl shadow-lg z-50 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/40">
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-primary" />
