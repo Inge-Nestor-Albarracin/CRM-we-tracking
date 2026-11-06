@@ -108,21 +108,27 @@ Generar un valor aleatorio en PowerShell (para `CRON_TOKEN` y `TELEGRAM_COPILOTO
 
 Avísame cuando estén a, b, e y f (c es opcional). **No me pases los valores.** Puedo comprobar que existen con `secrets list`, que solo muestra los nombres.
 
-## Paso 6 — Subir los cambios al editor (YO)
+## Paso 6 — Subir los cambios al editor (YO) ✅ (2026-11-06)
+
+Hecho: 10 funciones desplegadas, 6 eliminadas (las 5 de SEG-09 + `testValentina`, un sandbox de pruebas abierto que reapareció al sincronizar), 50 funciones en remoto = 50 en el repo. Checkpoint `Fase 0 - seguridad (sin publicar)` (`6aee149632ff04a4c3ab5362`).
+
 
 1. Escribir en el código del editor los archivos de la rama (`sandbox write`), sin usar su IA.
 2. Desplegar las funciones modificadas (`functions deploy <nombre>`, una por una; **nunca** `--force`).
 3. Eliminar las 5 funciones de SEG-09. Si el CLI no lo permite, te indico cómo hacerlo en el panel.
 4. Crear el checkpoint `"Fase 0 — seguridad"` en el historial del editor.
 
-## Paso 7 — Publicar (TÚ)
+## Paso 7 — Publicar ✅ (2026-11-06 19:14 UTC)
+
+Publicado el checkpoint `6aee149632ff04a4c3ab5362` con la API de Base44 (`POST /api/apps/{app_id}/deploy`; el CLI 0.3.1 no tiene comando `publish`). Commit desplegado `2bf35bd`.
+
 
 1. En el editor, abre **Vista previa** y revisa lo básico: login, Dashboard, una empresa, una cotización y Reuniones.
 2. Botón **Publicar** en la barra superior del editor. Hasta este momento, producción sigue con el código viejo.
 
 ## Paso 8 — Verificar (YO + TÚ)
 
-**YO:** `node scripts/verificar-fase0.mjs` debe mostrar las 12 pruebas con ✔.
+**YO:** `node scripts/verificar-fase0.mjs` debe mostrar las 12 pruebas con ✔. ✅ **12/12 el 2026-11-06**, tanto en `wtapp.base44.app` como en `crm.wetracking.co`.
 
 **TÚ, pruebas manuales:**
 
