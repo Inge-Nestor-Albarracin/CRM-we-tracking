@@ -82,6 +82,40 @@ export function calcularTotales(items, ivaPct = 19) {
   };
 }
 
+// Resumen para MOSTRAR una cotización ya guardada (PDF y correo), calculado desde sus ítems.
+// No se usan subtotal/descuento_total guardados porque no son uniformes: el formulario guarda
+// subtotal = bruto (antes del descuento), pero las cotizaciones creadas por NOVA guardan
+// subtotal = neto y descuento_total = 0 aunque los ítems traigan descuento_pct.
+// El total y el IVA sí se toman de lo guardado: es lo que se le cotizó al cliente.
+export function resumenCotizacion(cot) {
+  const lineas = (cot?.items || []).map(it => {
+    const cantidad = Number(it.cantidad) || 0;
+    const precio = Number(it.precio_unitario) || 0;
+    const dcto = Number(it.descuento_pct) || 0;
+    const bruto = cantidad * precio;
+    const neto = it.total_linea != null && it.total_linea !== '' ? Number(it.total_linea) : bruto * (1 - dcto / 100);
+    return { ...it, cantidad, precio_unitario: precio, descuento_pct: dcto, bruto, neto, ahorro: Math.max(0, bruto - neto) };
+  });
+  const bruto = lineas.reduce((s, l) => s + l.bruto, 0);
+  const neto = lineas.reduce((s, l) => s + l.neto, 0);
+  const descuento = Math.round(Math.max(0, bruto - neto));
+  const iva = Number(cot?.iva_valor) || 0;
+  const envio = Number(cot?.costo_envio) || 0;
+  const total = cot?.total != null ? Number(cot.total) : Math.round(neto) + iva + envio;
+  return {
+    lineas,
+    hayDescuento: descuento > 0,
+    bruto: Math.round(bruto),
+    descuento,
+    descuentoPct: bruto > 0 ? (descuento / bruto) * 100 : 0,
+    base: Math.round(neto),
+    ivaPct: Number(cot?.iva_pct) || 0,
+    iva,
+    envio,
+    total,
+  };
+}
+
 // Textos de las secciones 2, 3 y 4 de la cotización impresa (VALIDEZ DE LA OFERTA,
 // CONTRATO y METODOLOGÍA DE TRABAJO). Son solo un PUNTO DE PARTIDA: cada cotización guarda
 // su propio texto (texto_validez, texto_contrato, texto_metodologia) y el usuario lo edita o

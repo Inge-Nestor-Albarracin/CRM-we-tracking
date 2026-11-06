@@ -9,7 +9,7 @@ import { Plus, FileText, Printer, Send, Copy, CheckCircle2, XCircle, Trash2, Pen
 import { useToast } from '@/components/ui/use-toast';
 import CotizacionForm from '@/components/cotizaciones/CotizacionForm';
 import TRMIndicator from '@/components/TRMIndicator';
-import { formatMoneda, estadoEfectivo, WETRACKING, APP_URL } from '@/lib/wetracking';
+import { formatMoneda, estadoEfectivo, WETRACKING, APP_URL, resumenCotizacion } from '@/lib/wetracking';
 import { useUserRole } from '@/hooks/useUserRole';
 
 const ESTADO_STYLE = {
@@ -21,6 +21,8 @@ const ESTADO_STYLE = {
 };
 
 function cuerpoEmailCotizacion(cot, empresa) {
+  // Descuento calculado desde los ítems (ver resumenCotizacion): las cotizaciones de NOVA no lo guardan.
+  const r = resumenCotizacion(cot);
   const filas = (cot.items || []).map(it => `
     <tr>
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${it.producto_nombre}${it.descripcion ? `<br><span style="color:#6b7280;font-size:12px;">${it.descripcion}</span>` : ''}</td>
@@ -53,8 +55,8 @@ function cuerpoEmailCotizacion(cot, empresa) {
   </table>
   <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;font-size:13px;color:#111827;">
     <tr><td></td><td width="230">
-      <p style="margin:2px 0;"><span style="color:#6b7280;">Subtotal:</span> <strong style="float:right;">${formatMoneda(cot.subtotal, cot.moneda)}</strong></p>
-      ${cot.descuento_total > 0 ? `<p style="margin:2px 0;"><span style="color:#6b7280;">Descuento:</span> <strong style="float:right;">−${formatMoneda(cot.descuento_total, cot.moneda)}</strong></p>` : ''}
+      <p style="margin:2px 0;"><span style="color:#6b7280;">Subtotal:</span> <strong style="float:right;">${formatMoneda(r.bruto, cot.moneda)}</strong></p>
+      ${r.hayDescuento ? `<p style="margin:2px 0;color:#047a6a;"><span>Descuento:</span> <strong style="float:right;">−${formatMoneda(r.descuento, cot.moneda)}</strong></p>` : ''}
       <p style="margin:2px 0;"><span style="color:#6b7280;">IVA ${cot.iva_pct}%:</span> <strong style="float:right;">${formatMoneda(cot.iva_valor, cot.moneda)}</strong></p>
       <p style="margin:6px 0 0;padding-top:6px;border-top:2px solid #0b1f3a;font-size:15px;"><span>Total:</span> <strong style="float:right;">${formatMoneda(cot.total, cot.moneda)}</strong></p>
     </td></tr>
