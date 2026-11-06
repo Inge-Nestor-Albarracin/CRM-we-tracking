@@ -1,29 +1,19 @@
 import { useAuth } from '@/lib/AuthContext';
-import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 
-const ADMIN_EMAIL = 'ms@grouptso.com';
-
+// SEG-07: el rol sale de Base44 (user.role = 'admin' | 'user'), que solo un admin puede
+// cambiar desde el panel de Base44 → Usuarios de la app.
+// Antes salía de un correo fijo en el código o de PerfilUsuario.rol, una entidad que
+// cualquier usuario podía editar para darse rol Admin a sí mismo.
 export function useUserRole() {
-  const { user } = useAuth();
-  const email = user?.email;
-
-  const { data: perfiles = [], isLoading } = useQuery({
-    queryKey: ['perfiles-usuario'],
-    queryFn: () => base44.entities.PerfilUsuario.list(),
-    enabled: !!email,
-    staleTime: 60_000,
-  });
-
-  const perfil = perfiles.find(p => p.email === email);
-  const rol = email === ADMIN_EMAIL ? 'Admin' : (perfil?.rol ?? 'Comercial');
+  const { user, isLoadingAuth } = useAuth();
+  const isAdmin = user?.role === 'admin';
+  const rol = isAdmin ? 'Admin' : 'Comercial';
 
   return {
     rol,
-    email,
-    isAdmin: rol === 'Admin',
-    isComercial: rol === 'Comercial',
-    isLoading,
-    perfiles,
+    email: user?.email,
+    isAdmin,
+    isComercial: !isAdmin,
+    isLoading: isLoadingAuth,
   };
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShieldCheck } from 'lucide-react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import MyProfile from '@/components/perfiles/MyProfile';
 import TeamList from '@/components/perfiles/TeamList';
 import IntegracionesTab from '@/components/config/IntegracionesTab';
@@ -12,7 +12,6 @@ import { useUserRole } from '@/hooks/useUserRole';
 
 export default function Configuracion() {
   const [currentUser, setCurrentUser] = useState(null);
-  const queryClientHook = useQueryClient();
   const { isAdmin } = useUserRole();
 
   useEffect(() => {
@@ -54,7 +53,7 @@ export default function Configuracion() {
             <MyProfile user={currentUser} />
             <TeamList users={users} currentUserId={currentUser?.id} />
           </div>
-          <RolesPanel users={users} queryClient={queryClientHook} />
+          <RolesPanel users={users} />
         </TabsContent>
         )}
 
@@ -78,46 +77,20 @@ export default function Configuracion() {
   );
 }
 
-const ADMIN_EMAIL = 'ms@grouptso.com';
-
-function RolesPanel({ users, queryClient }) {
-  const { data: perfiles = [], refetch } = useQuery({
-    queryKey: ['perfiles-usuario'],
-    queryFn: () => base44.entities.PerfilUsuario.list(),
-  });
-
-  const [saving, setSaving] = useState(null);
-
-  const getPerfilRol = (email) => {
-    if (email === ADMIN_EMAIL) return 'Admin';
-    return perfiles.find(p => p.email === email)?.rol ?? 'Comercial';
-  };
-
-  const handleChangeRol = async (user, nuevoRol) => {
-    if (user.email === ADMIN_EMAIL) return;
-    setSaving(user.email);
-    const existing = perfiles.find(p => p.email === user.email);
-    if (existing) {
-      await base44.entities.PerfilUsuario.update(existing.id, { rol: nuevoRol });
-    } else {
-      await base44.entities.PerfilUsuario.create({ email: user.email, nombre: user.full_name, rol: nuevoRol });
-    }
-    await refetch();
-    queryClient.invalidateQueries({ queryKey: ['perfiles-usuario'] });
-    setSaving(null);
-  };
-
+// SEG-07: los roles se leen de Base44 (user.role) y se cambian SOLO en el panel de Base44
+// (Usuarios de la app). Antes este panel escribía PerfilUsuario.rol, que no es una fuente
+// de permisos segura.
+function RolesPanel({ users }) {
   return (
     <div className="bg-card rounded-xl border border-border/60 overflow-hidden">
       <div className="px-5 py-4 border-b border-border/40 flex items-center gap-2">
         <ShieldCheck className="w-4 h-4 text-primary" />
         <h2 className="text-sm font-semibold text-foreground">Roles y accesos</h2>
-        <span className="text-xs text-muted-foreground ml-1">Solo visible para Admin</span>
+        <span className="text-xs text-muted-foreground ml-1">Se gestionan en Base44 → Usuarios de la app</span>
       </div>
       <div className="divide-y divide-border/20">
         {users.map(user => {
-          const rol = getPerfilRol(user.email);
-          const isOwner = user.email === ADMIN_EMAIL;
+          const esAdmin = user.role === 'admin';
           return (
             <div key={user.id} className="flex items-center gap-4 px-5 py-3">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -129,26 +102,16 @@ function RolesPanel({ users, queryClient }) {
                 <p className="text-sm font-medium text-foreground truncate">{user.full_name || user.email}</p>
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
               </div>
-              {isOwner ? (
-                <span className="flex items-center gap-1 text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full flex-shrink-0">
-                  <ShieldCheck className="w-3 h-3" /> Admin
-                </span>
-              ) : (
-                <select
-                  value={rol}
-                  disabled={saving === user.email}
-                  onChange={e => handleChangeRol(user, e.target.value)}
-                  className="text-xs border border-border rounded-lg px-2 py-1.5 bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary flex-shrink-0"
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="Comercial">Comercial</option>
-                </select>
-              )}
+              <span className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${esAdmin ? 'text-primary bg-primary/10' : 'text-muted-foreground bg-muted'}`}>
+                {esAdmin && <ShieldCheck className="w-3 h-3" />} {esAdmin ? 'Admin' : 'Comercial'}
+              </span>
             </div>
           );
         })}
         {users.length === 0 && (
-          <p className="px-5 py-8 text-sm text-muted-foreground text-center">No hay usuarios registrados</p>
+          <p className="px-5 py-8 text-sm text-muted-foreground text-center">
+            La lista de usuarios solo se puede ver desde el panel de Base44 (Usuarios de la app).
+          </p>
         )}
       </div>
     </div>
