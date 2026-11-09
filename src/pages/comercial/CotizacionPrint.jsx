@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Cotizacion, Empresa, Contacto, base44 } from '@/api/base44Client';
-import { formatMoneda, WETRACKING, textosDeCotizacion, titulosDeCotizacion, resumenCotizacion } from '@/lib/wetracking';
+import { formatMoneda, WETRACKING, textosDeCotizacion, titulosDeCotizacion, resumenCotizacion, etiquetaTipo, PERIODOS_ALQUILER, textoDuracion } from '@/lib/wetracking';
 import WeLogo from '@/components/brand/WeLogo';
 
 const CIUDAD = 'Bogotá D.C.';
@@ -67,7 +67,7 @@ export default function CotizacionPrint() {
 
   useEffect(() => {
     if (!cot) return;
-    const tipoTxt = cot.tipo === 'software' ? 'Software' : 'Hardware';
+    const tipoTxt = etiquetaTipo(cot.tipo, { corto: true });
     const emp = (empresa?.nombre || '').replace(/[^\w\sáéíóúñ.-]/gi, '').trim();
     const prev = document.title;
     document.title = `Cotizacion ${tipoTxt}${emp ? ` ${emp}` : ''}`;
@@ -76,7 +76,9 @@ export default function CotizacionPrint() {
 
   if (isLoading || !cot) return <div style={{ padding: 40, fontFamily: 'var(--font-sans)', color: SUAVE }}>Cargando cotización...</div>;
 
-  const esSoftware = cot.tipo === 'software';
+  const esAlquiler = cot.tipo === 'alquiler';
+  const esServicios = cot.tipo === 'servicios';
+  const periodo = PERIODOS_ALQUILER[cot.alq_periodo] || PERIODOS_ALQUILER.mes;
   const fmtFecha = (f) => f ? new Date(f + 'T12:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
   const M = (n) => formatMoneda(n, cot.moneda);
   const r = resumenCotizacion(cot);
@@ -127,7 +129,7 @@ export default function CotizacionPrint() {
           </div>
           <div style={{ textAlign: 'right' }}>
             <p style={{ ...etiqueta, margin: 0 }}>Cotización</p>
-            <p style={{ margin: '2px 0 6px', fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 500, color: MARINO, lineHeight: 1 }}>{esSoftware ? 'Software' : 'Hardware'}</p>
+            <p style={{ margin: '2px 0 6px', fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 500, color: MARINO, lineHeight: 1 }}>{etiquetaTipo(cot.tipo)}</p>
             <span style={{ display: 'inline-block', background: MARINO, color: '#fff', borderRadius: 999, padding: '4px 12px', fontSize: 12, fontWeight: 700, letterSpacing: '.03em' }}>{cot.numero}</span>
           </div>
         </div>
@@ -158,8 +160,9 @@ export default function CotizacionPrint() {
             <tr>
               <th style={{ ...th, textAlign: 'left', borderTopLeftRadius: 10, width: 24 }}>#</th>
               <th style={{ ...th, textAlign: 'left', whiteSpace: 'normal' }}>Descripción</th>
-              <th style={{ ...th, textAlign: 'center', width: 56 }}>Cant.</th>
-              <th style={{ ...th, width: 104 }}>Valor unitario</th>
+              <th style={{ ...th, textAlign: 'center', width: 56 }}>{esServicios ? 'Horas' : 'Cant.'}</th>
+              <th style={{ ...th, width: 104 }}>{esServicios ? 'Valor hora' : esAlquiler ? `Tarifa / ${periodo.uno}` : 'Valor unitario'}</th>
+              {esAlquiler && <th style={{ ...th, textAlign: 'center', width: 76 }}>Duración</th>}
               {r.hayDescuento && <th style={{ ...th, textAlign: 'center', width: 56 }}>Dcto.</th>}
               <th style={{ ...th, borderTopRightRadius: 10, width: 112 }}>Valor total</th>
             </tr>
@@ -174,6 +177,7 @@ export default function CotizacionPrint() {
                 </td>
                 <td style={{ ...td, textAlign: 'center' }}>{l.cantidad.toLocaleString('es-CO')}</td>
                 <td style={td}>{M(l.precio_unitario)}</td>
+                {esAlquiler && <td style={{ ...td, textAlign: 'center' }}>{textoDuracion(l.duracion || cot.alq_duracion, cot.alq_periodo)}</td>}
                 {r.hayDescuento && (
                   <td style={{ ...td, textAlign: 'center' }}>
                     {l.descuento_pct > 0

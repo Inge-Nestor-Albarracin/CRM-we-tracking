@@ -56,8 +56,38 @@ export function formatMoneda(n, moneda = 'COP') {
   return `$${Math.round(Number(n)).toLocaleString('es-CO')}`;
 }
 
+// Tipos de cotización. hardware = venta de equipos y tags; software = licencia (exenta de IVA);
+// alquiler = equipos por un periodo (tarifa por día/semana/mes × duración); servicios = horas de
+// soporte, capacitación o implementación (cantidad = horas, precio = valor de la hora).
+export const TIPOS_COTIZACION = {
+  hardware: { label: 'Hardware', iva: true },
+  software: { label: 'Software', iva: false },
+  alquiler: { label: 'Alquiler de equipos', corto: 'Alquiler', iva: true },
+  servicios: { label: 'Servicios', iva: true },
+};
+export function etiquetaTipo(tipo, { corto = false } = {}) {
+  const t = TIPOS_COTIZACION[tipo] || TIPOS_COTIZACION.hardware;
+  return corto ? (t.corto || t.label) : t.label;
+}
+
+// Periodos de alquiler: singular y plural para el formulario y el PDF ("3 meses", "Tarifa / mes").
+export const PERIODOS_ALQUILER = {
+  dia: { uno: 'día', varios: 'días' },
+  semana: { uno: 'semana', varios: 'semanas' },
+  mes: { uno: 'mes', varios: 'meses' },
+};
+export function textoDuracion(duracion, periodo) {
+  const p = PERIODOS_ALQUILER[periodo] || PERIODOS_ALQUILER.mes;
+  const n = Number(duracion) || 1;
+  return `${n.toLocaleString('es-CO')} ${n === 1 ? p.uno : p.varios}`;
+}
+
+// Multiplicador de la línea: en alquiler, la duración (número de periodos); en lo demás, 1.
+const factorDuracion = (it) => (Number(it?.duracion) > 0 ? Number(it.duracion) : 1);
+
 // Cálculo de totales de una cotización a partir de sus ítems.
-// total_linea = cantidad × precio × (1 − dcto%); iva sobre la base con descuento.
+// total_linea = cantidad × precio × duración × (1 − dcto%); iva sobre la base con descuento.
+// (duración solo existe en alquiler; en los demás tipos vale 1.)
 export function calcularTotales(items, ivaPct = 19) {
   let subtotal = 0;
   let descuentoTotal = 0;
@@ -65,7 +95,7 @@ export function calcularTotales(items, ivaPct = 19) {
     const cantidad = Number(it.cantidad) || 0;
     const precio = Number(it.precio_unitario) || 0;
     const dcto = Number(it.descuento_pct) || 0;
-    const bruto = cantidad * precio;
+    const bruto = cantidad * precio * factorDuracion(it);
     const totalLinea = bruto * (1 - dcto / 100);
     subtotal += bruto;
     descuentoTotal += bruto - totalLinea;
@@ -92,7 +122,7 @@ export function resumenCotizacion(cot) {
     const cantidad = Number(it.cantidad) || 0;
     const precio = Number(it.precio_unitario) || 0;
     const dcto = Number(it.descuento_pct) || 0;
-    const bruto = cantidad * precio;
+    const bruto = cantidad * precio * factorDuracion(it);
     const neto = it.total_linea != null && it.total_linea !== '' ? Number(it.total_linea) : bruto * (1 - dcto / 100);
     return { ...it, cantidad, precio_unitario: precio, descuento_pct: dcto, bruto, neto, ahorro: Math.max(0, bruto - neto) };
   });
@@ -148,6 +178,18 @@ export function textosPorDefecto({ tipo, sw_periodicidad, validez_dias } = {}) {
   const contrato = esSoftware
     ? ['Contrato mínimo a 2 años.', 'Se envía previo al pago efectivo.'].join('\n')
     : '';
+  if (tipo === 'alquiler' || tipo === 'servicios') {
+    // Punto de partida neutro: la vigencia, y en alquiler la condición básica de los equipos.
+    // El comercial completa o borra el resto en el formulario.
+    const vigencia = `La presente cotización tendrá una vigencia de ${diasTxt} días hábiles contados a partir de la fecha de su emisión.`;
+    return {
+      validez: vigencia,
+      contrato: tipo === 'alquiler'
+        ? 'Los equipos se entregan en calidad de alquiler y continúan siendo propiedad de WeTracking. Al finalizar el periodo deben devolverse en el mismo estado en que fueron entregados, salvo el desgaste normal por uso.'
+        : '',
+      metodologia: '',
+    };
+  }
   const metodologia = esSoftware
     ? [
       'Visita presencial al inicio del proyecto con el fin de realizar la instalación de los chips. A partir de allí, el soporte será mensual de manera remota.',

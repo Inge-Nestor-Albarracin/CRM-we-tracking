@@ -11,12 +11,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { Plus, Trash2 } from 'lucide-react';
 import SelectorEmpresa from '@/components/crm/SelectorEmpresa';
 import ConversorUSD from '@/components/ConversorUSD';
-import { calcularTotales, formatMoneda, APP_URL, textosPorDefecto, textosDeCotizacion, titulosDeCotizacion, TITULOS_SECCIONES } from '@/lib/wetracking';
+import { calcularTotales, formatMoneda, APP_URL, textosPorDefecto, textosDeCotizacion, titulosDeCotizacion, TITULOS_SECCIONES, TIPOS_COTIZACION, etiquetaTipo, PERIODOS_ALQUILER } from '@/lib/wetracking';
 import { enviarCotizacionGmail } from '@/lib/gmailAutoSend';
 
 const ITEM_VACIO = { producto_id: '', producto_nombre: '', descripcion: '', cantidad: 1, precio_unitario: '', descuento_pct: 0 };
 // Servicio adicional opcional en cotizaciones de software (ej. de una empresa aliada).
 const EXTRA_VACIO = { producto_nombre: '', descripcion: '', cantidad: 1, precio_unitario: '' };
+// Sugerencias para el nombre de un servicio por horas (se puede escribir cualquier otro).
+const SUGERENCIAS_SERVICIO = ['Soporte técnico remoto', 'Soporte técnico en sitio', 'Capacitación', 'Implementación y configuración', 'Consultoría RFID'];
 
 // Texto predeterminado de una cotización de SOFTWARE. El software va EXENTO de IVA (0%).
 // Hay dos módulos: "inventarios" (tracking de activos/tags) y "samm" (plataforma de
@@ -62,9 +64,9 @@ async function sincronizarDocumentoCotizacion(cot) {
   if (!cot?.id || !cot?.empresa_id) return;
   const url = `${APP_URL}/comercial/cotizaciones/${cot.id}/print`;
   const payload = {
-    nombre: `Cotización ${cot.tipo === 'software' ? 'Software' : 'Hardware'} ${cot.numero || ''}`.trim(),
+    nombre: `Cotización ${etiquetaTipo(cot.tipo)} ${cot.numero || ''}`.trim(),
     categoria: 'Cotizacion',
-    descripcion: `${cot.tipo === 'software' ? 'Software' : 'Hardware'} · ${formatMoneda(cot.total, cot.moneda)}`,
+    descripcion: `${etiquetaTipo(cot.tipo)} · ${formatMoneda(cot.total, cot.moneda)}`,
     tipo_mime: 'link/cotizacion',
     contenido: url,
     empresa_id: cot.empresa_id,
@@ -99,6 +101,8 @@ const TONOS = {
   violet: { card: 'border-violet-200/70 bg-violet-50/50', num: 'bg-violet-500/15 text-violet-700' },
   amber: { card: 'border-amber-200/70 bg-amber-50/50', num: 'bg-amber-500/15 text-amber-700' },
   stone: { card: 'border-stone-200/80 bg-stone-50/70', num: 'bg-stone-500/15 text-stone-700' },
+  teal: { card: 'border-teal-200/70 bg-teal-50/50', num: 'bg-teal-500/15 text-teal-700' },
+  orange: { card: 'border-orange-200/70 bg-orange-50/50', num: 'bg-orange-500/15 text-orange-700' },
 };
 function Seccion({ numero, titulo, ayuda, tono = 'stone', accion, children }) {
   const t = TONOS[tono] || TONOS.stone;
@@ -120,7 +124,11 @@ const ACENTO = {
   sky: 'bg-white text-sky-700 shadow-sm ring-1 ring-sky-200',
   violet: 'bg-white text-violet-700 shadow-sm ring-1 ring-violet-200',
   stone: 'bg-white text-foreground shadow-sm ring-1 ring-stone-200',
+  teal: 'bg-white text-teal-700 shadow-sm ring-1 ring-teal-200',
+  orange: 'bg-white text-orange-700 shadow-sm ring-1 ring-orange-200',
 };
+// Color de cada tipo de cotización (el mismo de las etiquetas del listado).
+const TONO_TIPO = { hardware: 'sky', software: 'violet', alquiler: 'teal', servicios: 'orange' };
 function Segmentado({ value, opciones, onChange }) {
   return (
     <div className="flex gap-1 bg-muted/50 rounded-xl p-1 w-fit">
@@ -167,6 +175,7 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
     condiciones_pago: '50% anticipo, 50% contra entrega', tiempo_entrega: '', notas: '', costo_envio: '',
     sw_modulo: 'inventarios', sw_activos: '', sw_usuarios: '', sw_gigas: '', sw_solicitudes: '',
     sw_periodicidad: 'mensual', sw_precio: '', sw_descripcion: '',
+    alq_periodo: 'mes', alq_duracion: 1,
     texto_validez: '', texto_contrato: '', texto_metodologia: '',
     titulo_validez: TITULOS_SECCIONES.validez, titulo_contrato: TITULOS_SECCIONES.contrato, titulo_metodologia: TITULOS_SECCIONES.metodologia,
   });
@@ -181,11 +190,14 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
   const [textosEditados, setTextosEditados] = useState(TEXTOS_SIN_EDITAR);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const esSoftware = tipo === 'software';
+  const esAlquiler = tipo === 'alquiler';
+  const esServicios = tipo === 'servicios';
+  const periodo = PERIODOS_ALQUILER[form.alq_periodo] || PERIODOS_ALQUILER.mes;
 
   useEffect(() => {
     if (open) {
       if (cotizacion) {
-        setTipo(cotizacion.tipo === 'software' ? 'software' : 'hardware');
+        setTipo(TIPOS_COTIZACION[cotizacion.tipo] ? cotizacion.tipo : 'hardware');
         setForm({
           empresa_id: cotizacion.empresa_id || '',
           oportunidad_id: cotizacion.oportunidad_id || '',
@@ -206,6 +218,8 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
           sw_periodicidad: cotizacion.sw_periodicidad || 'mensual',
           sw_precio: cotizacion.tipo === 'software' ? (cotizacion.items?.[0]?.precio_unitario ?? cotizacion.total ?? '') : '',
           sw_descripcion: cotizacion.tipo === 'software' ? (cotizacion.items?.[0]?.descripcion || '') : '',
+          alq_periodo: PERIODOS_ALQUILER[cotizacion.alq_periodo] ? cotizacion.alq_periodo : 'mes',
+          alq_duracion: cotizacion.alq_duracion || cotizacion.items?.[0]?.duracion || 1,
           // Secciones 2, 3 y 4: se arranca de lo que esta cotización imprime HOY (lo guardado
           // si tiene textos propios, o el predeterminado de siempre si es de antes del cambio).
           texto_validez: textosDeCotizacion(cotizacion).validez,
@@ -225,7 +239,7 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
           : []);
       } else {
         setTipo('hardware');
-        setForm(f => ({ ...f, empresa_id: empresaFija || '', oportunidad_id: '', contacto_id: '', fecha_emision: hoyISO(), validez_dias: 15, iva_pct: 19, notas: '', costo_envio: '', sw_modulo: 'inventarios', sw_activos: '', sw_usuarios: '', sw_gigas: '', sw_solicitudes: '', sw_periodicidad: 'mensual', sw_precio: '', sw_descripcion: '', texto_validez: '', texto_contrato: '', texto_metodologia: '', titulo_validez: TITULOS_SECCIONES.validez, titulo_contrato: TITULOS_SECCIONES.contrato, titulo_metodologia: TITULOS_SECCIONES.metodologia }));
+        setForm(f => ({ ...f, empresa_id: empresaFija || '', oportunidad_id: '', contacto_id: '', fecha_emision: hoyISO(), validez_dias: 15, iva_pct: 19, notas: '', costo_envio: '', sw_modulo: 'inventarios', sw_activos: '', sw_usuarios: '', sw_gigas: '', sw_solicitudes: '', sw_periodicidad: 'mensual', sw_precio: '', sw_descripcion: '', alq_periodo: 'mes', alq_duracion: 1, texto_validez: '', texto_contrato: '', texto_metodologia: '', titulo_validez: TITULOS_SECCIONES.validez, titulo_contrato: TITULOS_SECCIONES.contrato, titulo_metodologia: TITULOS_SECCIONES.metodologia }));
         setSwDescEdited(false);
         setTextosEditados({ ...TEXTOS_SIN_EDITAR });
         setItems([{ ...ITEM_VACIO }]);
@@ -319,9 +333,15 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
     [swExtras],
   );
 
+  // En alquiler cada línea se multiplica por la duración (número de periodos); en los demás
+  // tipos se quita cualquier duración vieja para que no afecte el cálculo.
+  const itemsCalc = useMemo(() => (esAlquiler
+    ? items.map(it => ({ ...it, duracion: Number(form.alq_duracion) > 0 ? Number(form.alq_duracion) : 1 }))
+    : items.map(({ duracion: _d, ...it }) => it)), [esAlquiler, items, form.alq_duracion]);
+
   const totales = useMemo(
-    () => esSoftware ? calcularTotales([itemSoftware, ...extrasItems], 0) : calcularTotales(items, form.iva_pct),
-    [esSoftware, itemSoftware, extrasItems, items, form.iva_pct],
+    () => esSoftware ? calcularTotales([itemSoftware, ...extrasItems], 0) : calcularTotales(itemsCalc, form.iva_pct),
+    [esSoftware, itemSoftware, extrasItems, itemsCalc, form.iva_pct],
   );
 
   function setItem(idx, patch) {
@@ -337,7 +357,8 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
       producto_id: productoId,
       producto_nombre: p?.nombre || '',
       descripcion: p?.descripcion || '',
-      precio_unitario: p?.precio_venta ?? '',
+      // En alquiler el precio de venta no sirve de tarifa: se deja vacío para escribir la tarifa.
+      precio_unitario: esAlquiler ? '' : (p?.precio_venta ?? ''),
     });
   }
 
@@ -348,8 +369,13 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
         if (!(Number(form.sw_precio) > 0)) throw new Error('Ingresa el precio del software');
         itemsValidos = totales.items; // ítem único autogenerado
       } else {
-        itemsValidos = totales.items.filter(it => it.producto_nombre && it.cantidad > 0);
-        if (itemsValidos.length === 0) throw new Error('Agrega al menos un ítem con producto y cantidad');
+        itemsValidos = totales.items
+          .map(it => ({ ...it, producto_nombre: String(it.producto_nombre || '').trim() }))
+          .filter(it => it.producto_nombre && it.cantidad > 0);
+        if (itemsValidos.length === 0) {
+          throw new Error(esServicios ? 'Agrega al menos un servicio con nombre y horas' : esAlquiler ? 'Agrega al menos un equipo con cantidad' : 'Agrega al menos un ítem con producto y cantidad');
+        }
+        if (esAlquiler && !(Number(form.alq_duracion) > 0)) throw new Error('Indica la duración del alquiler');
       }
       const datos = {
         tipo,
@@ -376,6 +402,8 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
         sw_gigas: (esSoftware && form.sw_modulo === 'samm') ? (Number(form.sw_gigas) || 0) : undefined,
         sw_solicitudes: (esSoftware && form.sw_modulo === 'samm') ? (Number(form.sw_solicitudes) || 0) : undefined,
         sw_periodicidad: esSoftware ? form.sw_periodicidad : undefined,
+        alq_periodo: esAlquiler ? form.alq_periodo : undefined,
+        alq_duracion: esAlquiler ? (Number(form.alq_duracion) || 1) : undefined,
         // Textos de las secciones 2, 3 y 4. Se guardan siempre (vacío = no se imprime) y
         // textos_propios marca que esta cotización ya no usa los predeterminados quemados.
         texto_validez: String(form.texto_validez || ''),
@@ -416,15 +444,23 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
   });
 
   const total = totales.total + (Number(form.costo_envio) || 0);
-  const tonoTipo = esSoftware ? 'violet' : 'sky';
+  const tonoTipo = TONO_TIPO[tipo] || 'sky';
   const cambiarTipo = (k) => {
     if (k === tipo) return;
+    const antes = tipo;
     setTipo(k);
-    // Al pasar a hardware, descarta la línea auto de software (sin producto_id)
-    // para que no se filtre a un guardado de hardware; al pasar a software, limpia extras.
-    if (k === 'hardware') setItems(prev => { const hw = prev.filter(it => it.producto_id); return hw.length ? hw : [{ ...ITEM_VACIO }]; });
-    else setSwExtras([]);
+    if (k === 'software') { setSwExtras([]); return; }
+    // Entre hardware y alquiler se conservan los equipos elegidos del catálogo (con producto_id).
+    // Servicios usa líneas de texto libre: al entrar o salir de él se empieza con una fila vacía.
+    if (k === 'servicios' || antes === 'servicios' || antes === 'software') {
+      setItems(prev => {
+        const conProducto = prev.filter(it => it.producto_id);
+        return (k !== 'servicios' && antes !== 'servicios' && conProducto.length) ? conProducto : [{ ...ITEM_VACIO }];
+      });
+    }
   };
+  const etiquetaCantidad = esServicios ? 'Horas' : 'Cant.';
+  const etiquetaPrecio = esServicios ? 'Valor hora' : esAlquiler ? `Tarifa / ${periodo.uno}` : 'Precio unit.';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -438,8 +474,10 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
               value={tipo}
               onChange={cambiarTipo}
               opciones={[
-                { k: 'hardware', l: 'Hardware', sub: 'IVA 19%', tono: 'sky' },
+                { k: 'hardware', l: 'Hardware', sub: 'venta', tono: 'sky' },
                 { k: 'software', l: 'Software', sub: 'exento', tono: 'violet' },
+                { k: 'alquiler', l: 'Alquiler', sub: 'equipos', tono: 'teal' },
+                { k: 'servicios', l: 'Servicios', sub: 'por horas', tono: 'orange' },
               ]}
             />
           </div>
@@ -512,8 +550,8 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
 
           <Seccion
             numero={3}
-            titulo={esSoftware ? 'El software' : 'Los ítems'}
-            ayuda={esSoftware ? 'qué se licencia y por cuánto' : 'qué se vende y a qué precio'}
+            titulo={esSoftware ? 'El software' : esAlquiler ? 'Los equipos en alquiler' : esServicios ? 'Los servicios' : 'Los ítems'}
+            ayuda={esSoftware ? 'qué se licencia y por cuánto' : esAlquiler ? 'qué equipos, por cuánto tiempo y a qué tarifa' : esServicios ? 'cuántas horas y a qué valor' : 'qué se vende y a qué precio'}
             tono={tonoTipo}
             accion={esSoftware ? (
               <Button type="button" variant="outline" size="sm" className="h-7 text-xs bg-white" onClick={addExtra}>
@@ -521,7 +559,7 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
               </Button>
             ) : (
               <Button type="button" variant="outline" size="sm" className="h-7 text-xs bg-white" onClick={() => setItems(arr => [...arr, { ...ITEM_VACIO }])}>
-                <Plus className="w-3.5 h-3.5 mr-1" /> Agregar ítem
+                <Plus className="w-3.5 h-3.5 mr-1" /> {esServicios ? 'Agregar servicio' : esAlquiler ? 'Agregar equipo' : 'Agregar ítem'}
               </Button>
             )}
           >
@@ -612,13 +650,36 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
               </div>
             ) : (
               <div className="space-y-2">
+                {/* Alquiler: periodo de la tarifa y duración, comunes a todos los equipos. */}
+                {esAlquiler && (
+                  <div className="flex items-end gap-3 flex-wrap">
+                    <div className="space-y-1.5">
+                      <Label>Tarifa por</Label>
+                      <Segmentado
+                        value={form.alq_periodo}
+                        onChange={v => set('alq_periodo', v)}
+                        opciones={[{ k: 'dia', l: 'Día', tono: 'teal' }, { k: 'semana', l: 'Semana', tono: 'teal' }, { k: 'mes', l: 'Mes', tono: 'teal' }]}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Duración ({periodo.varios}) *</Label>
+                      <Input type="number" min="1" className="w-28 bg-white" value={form.alq_duracion} onChange={e => set('alq_duracion', e.target.value)} />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground/80 pb-2">Total de cada equipo = cantidad × tarifa × {Number(form.alq_duracion) || 1} {Number(form.alq_duracion) === 1 ? periodo.uno : periodo.varios}.</p>
+                  </div>
+                )}
+                {esServicios && (
+                  <datalist id="sugerencias-servicio">
+                    {[...SUGERENCIAS_SERVICIO, ...productosActivos.filter(p => p.categoria === 'Servicios').map(p => p.nombre)].map(n => <option key={n} value={n} />)}
+                  </datalist>
+                )}
                 <div className="border rounded-lg overflow-hidden bg-white">
                   <table className="w-full text-sm">
                     <thead className="bg-muted/40">
                       <tr className="text-xs text-muted-foreground">
-                        <th className="text-left px-3 py-2 font-medium w-[36%]">Producto</th>
-                        <th className="text-right px-2 py-2 font-medium w-[10%]">Cant.</th>
-                        <th className="text-right px-2 py-2 font-medium w-[18%]">Precio unit.</th>
+                        <th className="text-left px-3 py-2 font-medium w-[36%]">{esServicios ? 'Servicio' : esAlquiler ? 'Equipo' : 'Producto'}</th>
+                        <th className="text-right px-2 py-2 font-medium w-[10%]">{etiquetaCantidad}</th>
+                        <th className="text-right px-2 py-2 font-medium w-[18%]">{etiquetaPrecio}</th>
                         <th className="text-right px-2 py-2 font-medium w-[10%]">Dcto %</th>
                         <th className="text-right px-3 py-2 font-medium w-[18%]">Total</th>
                         <th className="w-[8%]" />
@@ -626,32 +687,46 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
                     </thead>
                     <tbody className="divide-y">
                       {items.map((it, idx) => (
-                        <tr key={idx}>
+                        <tr key={idx} className="align-top">
                           <td className="px-3 py-2">
-                            <Select value={it.producto_id} onValueChange={v => onProductoChange(idx, v)}>
-                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Producto..." /></SelectTrigger>
-                              <SelectContent>
-                                {productosActivos.map(p => (
-                                  <SelectItem key={p.id} value={p.id}>{p.nombre}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            {esServicios ? (
+                              <div className="space-y-1">
+                                <Input list="sugerencias-servicio" className="h-8 text-xs" value={it.producto_nombre} onChange={e => setItem(idx, { producto_nombre: e.target.value })} placeholder="Ej: Soporte técnico remoto" />
+                                <Input className="h-7 text-[11px]" value={it.descripcion || ''} onChange={e => setItem(idx, { descripcion: e.target.value })} placeholder="Descripción (opcional)" />
+                              </div>
+                            ) : (
+                              <Select value={it.producto_id} onValueChange={v => onProductoChange(idx, v)}>
+                                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={esAlquiler ? 'Equipo...' : 'Producto...'} /></SelectTrigger>
+                                <SelectContent>
+                                  {productosActivos.map(p => (
+                                    <SelectItem key={p.id} value={p.id}>
+                                      <span className="flex items-center gap-2">
+                                        {p.foto
+                                          ? <img src={p.foto} alt="" className="w-5 h-5 rounded object-cover flex-shrink-0" />
+                                          : <span className="w-5 h-5 rounded bg-muted flex-shrink-0" />}
+                                        {p.nombre}
+                                      </span>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
                           </td>
                           <td className="px-2 py-2">
                             <Input type="number" className="h-8 text-xs text-right" value={it.cantidad} onChange={e => setItem(idx, { cantidad: e.target.value })} />
                           </td>
                           <td className="px-2 py-2">
-                            <Input type="number" className="h-8 text-xs text-right" value={it.precio_unitario} onChange={e => setItem(idx, { precio_unitario: e.target.value })} />
+                            <Input type="number" className="h-8 text-xs text-right" value={it.precio_unitario} onChange={e => setItem(idx, { precio_unitario: e.target.value })} placeholder={esServicios ? 'Ej: 150000' : ''} />
                           </td>
                           <td className="px-2 py-2">
                             <Input type="number" className="h-8 text-xs text-right" value={it.descuento_pct} onChange={e => setItem(idx, { descuento_pct: e.target.value })} />
                           </td>
-                          <td className="px-3 py-2 text-right text-xs font-medium">
+                          <td className="px-3 py-2 text-right text-xs font-medium pt-4">
                             {formatMoneda(totales.items[idx]?.total_linea || 0, form.moneda)}
                           </td>
                           <td className="px-1 py-2 text-center">
                             <BotonQuitar
-                              title="Quitar ítem"
+                              title="Quitar"
                               disabled={items.length <= 1}
                               onClick={() => setItems(arr => arr.length > 1 ? arr.filter((_, i) => i !== idx) : arr)}
                             />
@@ -661,10 +736,15 @@ export default function CotizacionForm({ open, onOpenChange, cotizacion = null, 
                     </tbody>
                   </table>
                 </div>
+                {esAlquiler && (
+                  <p className="text-[11px] text-muted-foreground/80">Escribe la tarifa de alquiler por {periodo.uno} de cada equipo (no es el precio de venta).</p>
+                )}
                 {/* Referencia rápida: compramos en USD, cotizamos en COP */}
-                <div className="bg-white border rounded-lg px-3 py-1.5 w-fit">
-                  <ConversorUSD label="Costo USD → COP" />
-                </div>
+                {!esServicios && (
+                  <div className="bg-white border rounded-lg px-3 py-1.5 w-fit">
+                    <ConversorUSD label="Costo USD → COP" />
+                  </div>
+                )}
               </div>
             )}
 

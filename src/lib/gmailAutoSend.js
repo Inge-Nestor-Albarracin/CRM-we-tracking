@@ -1,5 +1,5 @@
 import { base44 } from '@/api/base44Client';
-import { APP_URL, formatMoneda } from '@/lib/wetracking';
+import { APP_URL, formatMoneda, etiquetaTipo } from '@/lib/wetracking';
 
 const inv = async (fn, args) => { const r = await base44.functions.invoke(fn, args); return r?.data ?? r; };
 
@@ -20,7 +20,7 @@ export async function enviarCotizacionGmail(cot) {
 
   const nombre = (contacto?.nombre || empresa?.nombre || '').trim();
   const saludo = nombre ? `Hola ${nombre.split(' ')[0]},` : 'Hola,';
-  const tt = cot.tipo === 'software' ? 'Software' : 'Hardware';
+  const tt = etiquetaTipo(cot.tipo);
   const link = `${APP_URL}/comercial/cotizaciones/${cot.id}/print`;
   const asunto = `Cotización ${tt} ${cot.numero || ''} — WeTracking`.replace('  ', ' ').trim();
   const cuerpo = [

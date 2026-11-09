@@ -10,9 +10,21 @@
     "tipo": {
       "type": "string",
       "title": "Tipo",
-      "enum": ["hardware", "software"],
+      "enum": ["hardware", "software", "alquiler", "servicios"],
       "default": "hardware",
-      "description": "hardware = con IVA 19%; software = exento (IVA 0%)"
+      "description": "hardware = venta con IVA 19%; software = exento (IVA 0%); alquiler = equipos por periodo (IVA 19%); servicios = horas de soporte/capacitación (IVA 19%)"
+    },
+    "alq_periodo": {
+      "type": "string",
+      "title": "Alquiler: periodo de la tarifa",
+      "enum": ["dia", "semana", "mes"],
+      "default": "mes",
+      "description": "Unidad de la tarifa de alquiler (precio_unitario de cada ítem es por este periodo)"
+    },
+    "alq_duracion": {
+      "type": "number",
+      "title": "Alquiler: duración",
+      "description": "Cantidad de periodos (ej. 3 meses). Se copia en items[].duracion"
     },
     "sw_activos": {
       "type": "number",
@@ -102,6 +114,7 @@
           "cantidad": { "type": "number" },
           "precio_unitario": { "type": "number" },
           "descuento_pct": { "type": "number" },
+          "duracion": { "type": "number", "description": "Solo alquiler: número de periodos. total_linea = cantidad × precio_unitario × duracion × (1 − dcto)" },
           "total_linea": { "type": "number" }
         }
       }

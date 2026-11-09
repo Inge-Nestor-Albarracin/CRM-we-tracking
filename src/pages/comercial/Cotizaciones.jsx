@@ -9,7 +9,15 @@ import { Plus, FileText, Printer, Send, Copy, CheckCircle2, XCircle, Trash2, Pen
 import { useToast } from '@/components/ui/use-toast';
 import CotizacionForm from '@/components/cotizaciones/CotizacionForm';
 import TRMIndicator from '@/components/TRMIndicator';
-import { formatMoneda, estadoEfectivo, WETRACKING, APP_URL, resumenCotizacion } from '@/lib/wetracking';
+import { formatMoneda, estadoEfectivo, WETRACKING, APP_URL, resumenCotizacion, TIPOS_COTIZACION, etiquetaTipo, textoDuracion } from '@/lib/wetracking';
+
+// Color de la etiqueta de cada tipo (los mismos tonos del formulario).
+const TIPO_STYLE = {
+  hardware: 'bg-sky-100 text-sky-700',
+  software: 'bg-violet-100 text-violet-700',
+  alquiler: 'bg-teal-100 text-teal-700',
+  servicios: 'bg-orange-100 text-orange-700',
+};
 import { useUserRole } from '@/hooks/useUserRole';
 
 const ESTADO_STYLE = {
@@ -25,7 +33,7 @@ function cuerpoEmailCotizacion(cot, empresa) {
   const r = resumenCotizacion(cot);
   const filas = (cot.items || []).map(it => `
     <tr>
-      <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${it.producto_nombre}${it.descripcion ? `<br><span style="color:#6b7280;font-size:12px;">${it.descripcion}</span>` : ''}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${it.producto_nombre}${cot.tipo === 'alquiler' ? ` <span style="color:#6b7280;font-size:12px;">(${textoDuracion(it.duracion || cot.alq_duracion, cot.alq_periodo)})</span>` : ''}${cot.tipo === 'servicios' ? ' <span style="color:#6b7280;font-size:12px;">(horas)</span>' : ''}${it.descripcion ? `<br><span style="color:#6b7280;font-size:12px;">${it.descripcion}</span>` : ''}</td>
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">${it.cantidad}</td>
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">${formatMoneda(it.precio_unitario, cot.moneda)}</td>
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">${formatMoneda(it.total_linea, cot.moneda)}</td>
@@ -208,11 +216,10 @@ export default function Cotizaciones() {
             </SelectContent>
           </Select>
           <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-            <SelectTrigger className="w-32 h-9"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-40 h-9"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="todas">Todo tipo</SelectItem>
-              <SelectItem value="hardware">Hardware</SelectItem>
-              <SelectItem value="software">Software</SelectItem>
+              {Object.keys(TIPOS_COTIZACION).map(k => <SelectItem key={k} value={k}>{etiquetaTipo(k)}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={filtroEstado} onValueChange={setFiltroEstado}>
@@ -250,8 +257,8 @@ export default function Cotizaciones() {
                         {cot.numero}
                       </button>
                       <Badge className={`text-[10px] border-transparent ${ESTADO_STYLE[estado] || ''}`}>{estado}</Badge>
-                      <Badge className={`text-[10px] border-transparent ${cot.tipo === 'software' ? 'bg-violet-100 text-violet-700' : 'bg-sky-100 text-sky-700'}`}>
-                        {cot.tipo === 'software' ? 'Software' : 'Hardware'}
+                      <Badge className={`text-[10px] border-transparent ${TIPO_STYLE[cot.tipo] || TIPO_STYLE.hardware}`}>
+                        {etiquetaTipo(cot.tipo, { corto: true })}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">

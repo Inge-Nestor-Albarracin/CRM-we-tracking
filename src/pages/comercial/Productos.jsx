@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Plus, Search, Pencil, Trash2, Tags, ImageIcon, Upload, X, Download } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, Tags, ImageIcon, Upload, X, Download, Camera } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { detectarTipoRfid } from '@/lib/rfid';
@@ -60,7 +60,12 @@ export default function Productos() {
   const [form, setForm] = useState(VACIO);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const [cargandoBodega, setCargandoBodega] = useState(false);
+  const [soloSinFoto, setSoloSinFoto] = useState(false);
+  // Subida rápida desde la tarjeta: id del producto al que se le está subiendo la foto.
+  const [subiendoEn, setSubiendoEn] = useState(null);
   const fotoRef = useRef(null);
+  const fotoRapidaRef = useRef(null);
+  const productoFotoRapida = useRef(null);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   // Carga inicial del inventario de bodega (un clic, idempotente por SKU/nombre)
@@ -114,6 +119,28 @@ export default function Productos() {
     e.target.value = '';
   }
 
+  // Foto desde la tarjeta: se sube y se guarda en el producto en un solo paso.
+  function elegirFotoRapida(p) {
+    productoFotoRapida.current = p;
+    fotoRapidaRef.current?.click();
+  }
+  async function subirFotoRapida(e) {
+    const file = e.target.files?.[0];
+    const p = productoFotoRapida.current;
+    e.target.value = '';
+    if (!file || !p) return;
+    setSubiendoEn(p.id);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      await Producto.update(p.id, { foto: file_url });
+      qc.invalidateQueries({ queryKey: ['productos'] });
+      toast({ title: 'Foto guardada', description: p.nombre });
+    } catch (err) {
+      toast({ title: 'Error al subir la foto', description: err?.message || String(err), variant: 'destructive' });
+    }
+    setSubiendoEn(null);
+  }
+
   const { data: productos = [], isLoading } = useQuery({
     queryKey: ['productos'],
     queryFn: () => Producto.list('-updated_date'),
@@ -135,6 +162,7 @@ export default function Productos() {
 
   const guardar = useMutation({
     mutationFn: async () => {
+      if (!form.foto) throw new Error('La foto del producto es obligatoria');
       const datos = {
         nombre: form.nombre,
         sku: form.sku,
@@ -192,15 +220,23 @@ export default function Productos() {
     const q = search.toLowerCase();
     const matchSearch = !q || p.nombre?.toLowerCase().includes(q) || p.sku?.toLowerCase().includes(q) || p.descripcion?.toLowerCase().includes(q);
     const matchCat = filterCat === 'todas' || p.categoria === filterCat;
-    return matchSearch && matchCat;
+    return matchSearch && matchCat && (!soloSinFoto || !p.foto);
   });
+  const sinFoto = productos.filter(p => !p.foto).length;
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Productos</h1>
-          <p className="text-sm text-muted-foreground mt-1">Catálogo RFID: {productos.length} producto{productos.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Catálogo RFID: {productos.length} producto{productos.length !== 1 ? 's' : ''}
+            {sinFoto > 0 && (
+              <button type="button" onClick={() => setSoloSinFoto(v => !v)} className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-800 px-2 py-0.5 text-xs font-semibold hover:bg-amber-200">
+                <Camera className="w-3 h-3" /> {sinFoto} sin foto{soloSinFoto ? ' · ver todos' : ''}
+              </button>
+            )}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {productos.length < INVENTARIO_BODEGA.length && (
@@ -228,12 +264,15 @@ export default function Productos() {
         </Select>
       </div>
 
+      {/* Input oculto para la subida rápida de fotos desde las tarjetas */}
+      <input ref={fotoRapidaRef} type="file" accept="image/*" className="hidden" onChange={subirFotoRapida} />
+
       {isLoading ? (
         <div className="text-center py-12 text-muted-foreground">Cargando...</div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           <Tags className="w-10 h-10 mx-auto mb-3 opacity-20" />
-          <p className="text-sm">{search || filterCat !== 'todas' ? 'Sin resultados' : 'No hay productos en el catálogo todavía'}</p>
+          <p className="text-sm">{soloSinFoto ? 'Todos los productos tienen foto' : search || filterCat !== 'todas' ? 'Sin resultados' : 'No hay productos en el catálogo todavía'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -250,10 +289,19 @@ export default function Productos() {
             return (
               <div key={p.id} className={`group bg-card border border-border/60 rounded-xl overflow-hidden hover:shadow-md transition-all ${p.activo === false ? 'opacity-60' : ''}`}>
                 {/* Imagen grande */}
-                <button onClick={() => abrirEditar(p)} className="relative w-full aspect-square bg-muted flex items-center justify-center overflow-hidden">
+                <button
+                  onClick={() => (p.foto ? abrirEditar(p) : elegirFotoRapida(p))}
+                  className={`relative w-full aspect-square flex items-center justify-center overflow-hidden ${p.foto ? 'bg-muted' : 'bg-amber-50 border-b-2 border-dashed border-amber-300 hover:bg-amber-100'}`}
+                  title={p.foto ? p.nombre : 'Subir foto'}
+                >
                   {p.foto
                     ? <img src={p.foto} alt={p.nombre} className="w-full h-full object-cover" />
-                    : <ImageIcon className="w-12 h-12 text-muted-foreground/30" strokeWidth={1.5} />}
+                    : (
+                      <span className="flex flex-col items-center gap-1.5 text-amber-700">
+                        <Camera className="w-9 h-9" strokeWidth={1.5} />
+                        <span className="text-xs font-semibold">{subiendoEn === p.id ? 'Subiendo...' : 'Falta foto · subir'}</span>
+                      </span>
+                    )}
                   {p.tipo_rfid && (
                     <span className="absolute top-2 left-2 text-[10px] font-semibold bg-background/90 backdrop-blur border border-border rounded-full px-2 py-0.5 text-foreground">{p.tipo_rfid}</span>
                   )}
@@ -307,7 +355,7 @@ export default function Productos() {
                 ? <img src={form.foto} alt="" className="w-16 h-16 rounded-lg object-cover border border-border/40" />
                 : <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center flex-shrink-0"><ImageIcon className="w-6 h-6 text-muted-foreground/40" /></div>}
               <div className="space-y-1.5">
-                <Label>Foto del producto</Label>
+                <Label>Foto del producto *</Label>
                 <div className="flex items-center gap-2">
                   <input ref={fotoRef} type="file" accept="image/*" className="hidden" onChange={subirFoto} />
                   <Button type="button" variant="outline" size="sm" onClick={() => fotoRef.current?.click()} disabled={subiendoFoto}>
@@ -315,6 +363,7 @@ export default function Productos() {
                   </Button>
                   {form.foto && <Button type="button" variant="ghost" size="sm" onClick={() => set('foto', '')}><X className="w-3.5 h-3.5" /></Button>}
                 </div>
+                {!form.foto && <p className="text-[11px] text-amber-700">Obligatoria: todos los productos deben tener foto.</p>}
               </div>
             </div>
 
@@ -412,7 +461,7 @@ export default function Productos() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModal(false)}>Cancelar</Button>
-            <Button onClick={() => guardar.mutate()} disabled={!form.nombre || guardar.isPending}>
+            <Button onClick={() => guardar.mutate()} disabled={!form.nombre || !form.foto || subiendoFoto || guardar.isPending} title={!form.foto ? 'Sube la foto del producto para guardar' : undefined}>
               {guardar.isPending ? 'Guardando...' : 'Guardar'}
             </Button>
           </DialogFooter>
