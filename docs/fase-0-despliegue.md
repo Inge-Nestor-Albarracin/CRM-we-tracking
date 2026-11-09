@@ -169,3 +169,5 @@ Después de publicar, `verificar-fase0.mjs` sigue en 12/12.
 **Ajuste publicado el 2026-11-06 20:12 UTC** (checkpoint `6aee3407b3f38a12adf0d19f`): PDF más sobrio (sin círculos ni píldoras, cabe en una hoja) y barra superior del CRM del color del fondo, con el logo en el menú lateral. Seguridad: 12/12.
 
 **Para volver atrás:** historial de versiones del editor → `Fase 0 - seguridad (sin publicar)` → Publicar. Ese checkpoint conserva la seguridad sin el diseño nuevo.
+
+**Publicado el 2026-11-09 15:52 UTC** (checkpoint `6af1eb3140a7109dbdf4e452`): cotizaciones de **alquiler de equipos** (tarifa por día/semana/mes × duración) y de **servicios por horas**; foto obligatoria en productos, con subida rápida desde la tarjeta y filtro "sin foto". El esquema de `Cotizacion` (tipos `alquiler`/`servicios`, `alq_periodo`, `alq_duracion`, `items[].duracion`) quedó activo al subir el archivo de la entidad; son cambios solo aditivos. Seguridad: 12/12.
